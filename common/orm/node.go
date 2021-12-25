@@ -6,9 +6,9 @@ import (
 )
 
 const (
-	LEVEL_USER_ADMIN int = iota
+	LAVEL_USER_BLOCK int = iota
+	LEVEL_USER_ADMIN
 	LAVEL_USER_NORMAL
-	LAVEL_USER_BLOCK
 )
 
 type Node struct {
@@ -27,7 +27,8 @@ type User struct {
 
 	Email    string `json:"email"`
 	Password string
-	Role     int `json:"role"`
+	Role     int    `json:"role"`
+	Token    string `json:"token"`
 
 	Nodes []Node `gorm:"many2many:node_user;"`
 }

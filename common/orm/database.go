@@ -41,4 +41,8 @@ func Init() {
 	log.Printf("Driver: %s, Dsn: %s", config.GetDbDriver(), config.GetDSN())
 
 	DB = o.Open()
+
+	if err := DB.AutoMigrate(&User{}, &Node{}); err != nil {
+		log.Fatal(err)
+	}
 }

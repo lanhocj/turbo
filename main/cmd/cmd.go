@@ -12,6 +12,7 @@ func RunApplicationWithArgs(args []string) error {
 
 	commands := []*cli.Command{
 		supportServeCommand(),
+		supportAddSuperUser(),
 	}
 
 	app := &cli.App{

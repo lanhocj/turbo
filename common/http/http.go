@@ -11,14 +11,15 @@ func Start() error {
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
 
+	r.Static("/static", "./static")
+
 	addr := config.GetAddr()
 
 	r.LoadHTMLGlob("template/*.tmpl")
 
 	api := r.Group("/api")
 	{
-		api.GET("/")
-		api.GET("/register")
+		api.GET("/register", ApiRegisterUserHandler)
 
 		api.Use()
 		{
@@ -31,7 +32,7 @@ func Start() error {
 	{
 		front.GET("/", IndexHandler)
 		front.GET("/nodes")
-		front.GET("/users")
+		front.GET("/users", ListUserHandler)
 		front.GET("/config")
 	}
 
