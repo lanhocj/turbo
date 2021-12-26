@@ -22,6 +22,7 @@ func RunApplicationWithArgs(args []string) error {
 	commands := []*cli.Command{
 		webServerCommand(),
 		authControlCommands(),
+		secretKeyGeneratorCommand(),
 	}
 
 	app := &cli.App{

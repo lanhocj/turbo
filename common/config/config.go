@@ -1,6 +1,7 @@
 package config
 
 import (
+	"encoding/base64"
 	"fmt"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
@@ -22,6 +23,13 @@ type Object struct {
 		Host string `yaml:"host" json:"host"`
 		Port string `yaml:"port" json:"port"`
 	} `yaml:"http" json:"http"`
+
+	App struct {
+		Title       string `yaml:"title"`
+		Secret      string `yaml:"secret"`
+		Description string `yaml:"description"`
+		Copyright   string `yaml:"copyright"`
+	} `yaml:"app"`
 }
 
 var cnf = &Object{}
@@ -43,10 +51,10 @@ func (c *Object) LoadFile(in string) error {
 
 func (c *Object) GetAddr() string     { return net.JoinHostPort(c.Http.Host, c.Http.Port) }
 func (c *Object) GetDbDriver() string { return cnf.Database.Driver }
+func (c *Object) getSecret() string   { return cnf.App.Secret }
 
 func (c *Object) GetDSN() string {
 	if len(c.Database.URI) <= 0 {
-		// user:password@tcp(localhost:3306)/test
 		return fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4",
 			c.Database.User,
 			c.Database.Password,
@@ -62,3 +70,9 @@ func (c *Object) GetDSN() string {
 func GetAddr() string     { return cnf.GetAddr() }
 func GetDbDriver() string { return cnf.GetDbDriver() }
 func GetDSN() string      { return cnf.GetDSN() }
+func Copy() *Object       { return cnf }
+
+func GetSecret() []byte {
+	dec, _ := base64.StdEncoding.DecodeString(cnf.getSecret())
+	return dec
+}

@@ -22,13 +22,21 @@ type Node struct {
 	CreatedAt time.Time
 }
 
+type Token struct {
+	gorm.Model
+
+	Token  string
+	UserID int
+	User   User `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+}
+
 type User struct {
 	gorm.Model
 
 	Email    string `json:"email"`
 	Password string `json:"password"`
 	Role     int    `json:"role"`
-	Token    string `json:"token"`
+	Hash     string `json:"hash"`
 
 	Nodes []Node `gorm:"many2many:node_user;"`
 }

@@ -4,7 +4,6 @@ import (
 	"github.com/laamho/turbo/app/service/http"
 	"github.com/laamho/turbo/common"
 	"github.com/laamho/turbo/common/config"
-	"github.com/laamho/turbo/common/lpc"
 	"github.com/laamho/turbo/common/orm"
 	"github.com/urfave/cli/v2"
 	"log"
@@ -17,6 +16,7 @@ func webServerCommand() *cli.Command {
 		Flags: []cli.Flag{
 			configFlag,
 		},
+
 		Action: serveActionHandler,
 	}
 }
@@ -30,13 +30,15 @@ func serveActionHandler(c *cli.Context) error {
 
 	orm.Initialize()
 
-	common.Must(orm.AutoMigrate(&orm.User{}))
+	common.Must(orm.AutoMigrate(&orm.User{}, &orm.Node{}, &orm.Token{}))
+
 	log.Println("Database initialization & connected successfully")
 
-	l := lpc.RPC{}
-	if err := l.Listen(); err != nil {
-		panic(err)
-	}
+	go func() {
+		if err := l.Listen(); err != nil {
+			panic(err)
+		}
+	}()
 
 	return http.StartWebApplication()
 }
