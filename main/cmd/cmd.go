@@ -1,6 +1,15 @@
 package cmd
 
-import "github.com/urfave/cli/v2"
+import (
+	"github.com/urfave/cli/v2"
+)
+
+var configFlag = &cli.StringFlag{
+	Name:     "config",
+	Aliases:  []string{"c"},
+	Usage:    "Load config through `FILE`",
+	Required: true,
+}
 
 func RunApplicationWithArgs(args []string) error {
 	authors := []*cli.Author{
@@ -11,8 +20,8 @@ func RunApplicationWithArgs(args []string) error {
 	}
 
 	commands := []*cli.Command{
-		supportServeCommand(),
-		supportAddSuperUser(),
+		webServerCommand(),
+		authControlCommands(),
 	}
 
 	app := &cli.App{

@@ -1,25 +1,21 @@
 package cmd
 
 import (
-	"fmt"
+	"github.com/laamho/turbo/app/service/http"
+	"github.com/laamho/turbo/common"
 	"github.com/laamho/turbo/common/config"
-	"github.com/laamho/turbo/common/http"
+	"github.com/laamho/turbo/common/lpc"
 	"github.com/laamho/turbo/common/orm"
 	"github.com/urfave/cli/v2"
 	"log"
 )
 
-func supportServeCommand() *cli.Command {
+func webServerCommand() *cli.Command {
 	return &cli.Command{ // turbo run
 		Name:  "run",
 		Usage: "Start Turbo Web Service",
 		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:     "config",
-				Aliases:  []string{"c"},
-				Usage:    "set config file `path`",
-				Required: true,
-			},
+			configFlag,
 		},
 		Action: serveActionHandler,
 	}
@@ -32,9 +28,15 @@ func serveActionHandler(c *cli.Context) error {
 		log.Fatal(err)
 	}
 
-	orm.Init()
+	orm.Initialize()
 
-	fmt.Printf("DB:init:%v", orm.DB)
+	common.Must(orm.AutoMigrate(&orm.User{}))
+	log.Println("Database initialization & connected successfully")
 
-	return http.Start()
+	l := lpc.RPC{}
+	if err := l.Listen(); err != nil {
+		panic(err)
+	}
+
+	return http.StartWebApplication()
 }

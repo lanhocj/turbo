@@ -1,7 +1,8 @@
 GO:=go
 BUILD_DIR:=build
-BUILD_EXECUTE:=turbo
-OUTPUT=$(join $(BUILD_DIR)/,$(BUILD_EXECUTE))
+BUILD_NAME:=turbo
+OUTPUT=$(join $(BUILD_DIR)/,$(BUILD_NAME))
+
 
 .PHONY: build clean
 

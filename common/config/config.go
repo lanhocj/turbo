@@ -24,9 +24,9 @@ type Object struct {
 	} `yaml:"http" json:"http"`
 }
 
-var Config = &Object{}
+var cnf = &Object{}
 
-func New() *Object { return Config }
+func New() *Object { return cnf }
 
 func (c *Object) LoadFile(in string) error {
 	tmp, err := ioutil.ReadFile(in)
@@ -42,7 +42,7 @@ func (c *Object) LoadFile(in string) error {
 }
 
 func (c *Object) GetAddr() string     { return net.JoinHostPort(c.Http.Host, c.Http.Port) }
-func (c *Object) GetDbDriver() string { return Config.Database.Driver }
+func (c *Object) GetDbDriver() string { return cnf.Database.Driver }
 
 func (c *Object) GetDSN() string {
 	if len(c.Database.URI) <= 0 {
@@ -59,6 +59,6 @@ func (c *Object) GetDSN() string {
 }
 
 // GetAddr returns addr..
-func GetAddr() string     { return Config.GetAddr() }
-func GetDbDriver() string { return Config.GetDbDriver() }
-func GetDSN() string      { return Config.GetDSN() }
+func GetAddr() string     { return cnf.GetAddr() }
+func GetDbDriver() string { return cnf.GetDbDriver() }
+func GetDSN() string      { return cnf.GetDSN() }
