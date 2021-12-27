@@ -3,6 +3,7 @@ package middleware
 import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"github.com/laamho/turbo/common/util"
 )
 
 func Authenticator() gin.HandlerFunc {
@@ -10,10 +11,12 @@ func Authenticator() gin.HandlerFunc {
 		session := sessions.Default(ctx)
 		token := session.Get("token")
 
-		if token == nil {
+		if util.Empty(token) {
 			ctx.Redirect(302, "/login")
 			return
 		}
+
+		ctx.Set("token", token)
 
 		ctx.Next()
 	}

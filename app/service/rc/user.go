@@ -7,12 +7,15 @@ import (
 	"github.com/xtls/xray-core/common/serial"
 	"github.com/xtls/xray-core/proxy/trojan"
 	"log"
+	"strings"
 )
 
 // AddUser to cluster through xray api
-func AddUser(email, password string, level uint32, c command.HandlerServiceClient) error {
+func AddUser(tag, email, password string, level uint32, c command.HandlerServiceClient) error {
+	tag = strings.ToUpper(tag)
+
 	resp, err := c.AlterInbound(context.Background(), &command.AlterInboundRequest{
-		Tag: "proxy",
+		Tag: tag,
 		Operation: serial.ToTypedMessage(&command.AddUserOperation{
 			User: &protocol.User{
 				Email: email,
@@ -34,9 +37,11 @@ func AddUser(email, password string, level uint32, c command.HandlerServiceClien
 }
 
 // RemoveUser to cluster through xray api
-func RemoveUser(email string, c command.HandlerServiceClient) error {
+func RemoveUser(tag, email string, c command.HandlerServiceClient) error {
+	tag = strings.ToUpper(tag)
+
 	resp, err := c.AlterInbound(context.Background(), &command.AlterInboundRequest{
-		Tag: "proxy",
+		Tag: tag,
 		Operation: serial.ToTypedMessage(&command.RemoveUserOperation{
 			Email: email,
 		}),

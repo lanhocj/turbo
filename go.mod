@@ -12,6 +12,7 @@ require (
 	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/urfave/cli/v2 v2.3.0
 	github.com/xtls/xray-core v1.5.1
+	google.golang.org/grpc v1.43.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
 	gopkg.in/go-playground/validator.v9 v9.29.1 // indirect

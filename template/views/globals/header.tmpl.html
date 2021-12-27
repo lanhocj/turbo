@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{{.Title}}</title>
+    <title>{{ if .CurrentPageTitle}}{{.CurrentPageTitle}} - {{end}}{{.globals.Title}}</title>
     <meta name="description" content="{{ .Description }}">
 
     <link rel="stylesheet" href="/static/app.css">
-    <script src="/static/app.js"></script>
 </head>
-<body>{{ end }}
+<body>
+<main id="main">{{ end }}

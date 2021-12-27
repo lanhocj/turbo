@@ -4,6 +4,7 @@ import "github.com/laamho/turbo/common/config"
 
 type Menu struct {
 	Name, Link string
+	Role       int
 	Menus      Menus
 }
 
@@ -28,6 +29,7 @@ func (g *GlobalPageData) Init() {
 	g.Description = conf.App.Description
 	g.Copyright = conf.App.Copyright
 
+	g.AddMenu("配置文件", "/")
 	g.AddMenu("节点", "/nodes")
 	g.AddMenu("用户", "/users")
 }

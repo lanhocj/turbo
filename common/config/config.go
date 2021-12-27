@@ -55,7 +55,7 @@ func (c *Object) getSecret() string   { return cnf.App.Secret }
 
 func (c *Object) GetDSN() string {
 	if len(c.Database.URI) <= 0 {
-		return fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4",
+		return fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=true",
 			c.Database.User,
 			c.Database.Password,
 			c.Database.Host,

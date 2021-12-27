@@ -2,7 +2,6 @@ package orm
 
 import (
 	"gorm.io/gorm"
-	"time"
 )
 
 const (
@@ -17,9 +16,6 @@ type Node struct {
 	Addr, Port, Tag string
 
 	Users []User `gorm:"many2many:node_user;"`
-
-	UpdatedAt time.Time
-	CreatedAt time.Time
 }
 
 type Token struct {
@@ -33,10 +29,10 @@ type Token struct {
 type User struct {
 	gorm.Model
 
-	Email    string `json:"email"`
-	Password string `json:"password"`
-	Role     int    `json:"role"`
-	Hash     string `json:"hash"`
+	Email    string `json:"email" gorm:"email,omitempty"`
+	Password string `json:"-" gorm:"password,omitempty"`
+	Role     int    `json:"role" gorm:"role,omitempty"`
+	Hash     string `json:"-" gorm:"hash,omitempty"`
 
-	Nodes []Node `gorm:"many2many:node_user;"`
+	Nodes []Node `json:"nodes" gorm:"many2many:node_user;"`
 }

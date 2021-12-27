@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/laamho/turbo/common"
 	"github.com/laamho/turbo/common/orm"
+	"github.com/laamho/turbo/common/util"
 	"log"
 	"net"
 	"net/rpc"
@@ -68,6 +69,8 @@ func (r *RpcService) CreateUser(req interface{}, res *string) error {
 	if err := json.Unmarshal(enc, &user); err != nil {
 		return err
 	}
+
+	user.Password = util.Hash(user.Email, user.Password)
 
 	log.Printf("Create user via command line [%s]", user.Email)
 	orm.DB().Create(&user)

@@ -4,6 +4,8 @@ func empty(o interface{}) bool {
 	switch s := o.(type) {
 	case string:
 		return len(s) == 0
+	case nil:
+		return true
 	default:
 		return false
 	}

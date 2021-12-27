@@ -29,16 +29,22 @@ func StartWebApplication() error {
 	front := r.Group("/")
 	{
 		front.GET("/login", controller.LoginHandler())
+		front.POST("/login", controller.RequestLoginHandler())
 		front.GET("/register")
 		front.GET("/c/:id")
 
 		front.Use(middleware.Authenticator())
 		{
-			front.GET("/")
-			front.GET("/nodes")
-			front.GET("/users")
+			front.GET("/", controller.IndexHandler())
+			front.GET("/nodes", controller.NodesListHandler())
+			front.GET("/users", controller.UsersListHandler())
 			front.GET("/config")
 		}
+	}
+
+	api := r.Group("api")
+	{
+		api.GET("/node", controller.AddNodeHandler())
 	}
 
 	log.Printf("Listen at %s\n", addr)

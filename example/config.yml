@@ -3,6 +3,7 @@ app:
   secret: lQlYFGT5ZJBhsvZoQCf7qKBbWXtQ0FnnA7Wzsu6jtf8=
   description: Turbo
   copyright: Laam Ho
+  allowRegistration: false
 
 database:
   driver: mysql

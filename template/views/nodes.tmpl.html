@@ -1,0 +1,38 @@
+{{ template "globals/header.tmpl.html" . }}
+{{$curLink := .CurrentPath}}
+<header class="header">
+    <div class="wrapper">
+        <div class="header-nav">
+            <div class="logo">
+                <h1><a href="">Turbo</a></h1>
+            </div>
+
+            <nav class="menus">
+                {{ range .globals.Menus }}
+                <a class="menu-item {{if eq .Link $curLink}}active{{end}}" href="{{.Link}}">{{.Name}}</a>
+                {{ end }}
+            </nav>
+        </div>
+    </div>
+</header>
+
+<div class="content">
+    <div class="wrapper">
+        <section class="section">
+            <div class="section-header">
+                <h1>服务器节点</h1>
+
+                <ul class="right-actions">
+                    <li><a @click="addNodePopup" href="javascript:void(0);">手动添加节点</a></li>
+                    <li><a href="javascript:void(0);">安装脚本</a></li>
+                </ul>
+            </div>
+
+            <div class="node-list">
+                <node-item></node-item>
+                <node-item></node-item>
+            </div>
+        </section>
+    </div>
+</div>
+{{ template "globals/footer.tmpl.html" }}
