@@ -17,8 +17,8 @@ func StartWebApplication() error {
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
 
-	r.LoadHTMLFiles(util.RelativeFilePath("template")...)
-	r.Static("/static", "/static")
+	r.LoadHTMLFiles(util.RelativeFilePath("template/views")...)
+	r.Static("/static", "template/static")
 
 	store := cookie.NewStore(config.GetSecret())
 	r.Use(sessions.Sessions("turbo", store))
