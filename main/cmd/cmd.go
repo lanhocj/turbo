@@ -27,7 +27,6 @@ func RunApplicationWithArgs(args []string) error {
 
 	app := &cli.App{
 		Authors:  authors,
-		HideHelp: true,
 		Usage:    "A Proxy Management Tool",
 		Commands: commands,
 	}

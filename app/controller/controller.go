@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"github.com/laamho/turbo/app/service/rc/client"
 	"github.com/laamho/turbo/common/orm"
 	"github.com/laamho/turbo/common/util"
 	"github.com/xtls/xray-core/common/errors"
@@ -95,13 +96,32 @@ func NodesListHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token := c.GetString("token")
 		user := new(orm.User)
+		node := new(orm.Node)
+		var nodes []orm.Node
 		orm.DB().Where("hash", token).Find(&user)
+		orm.DB().Model(node).Find(&nodes)
+
+		var nodeResult []map[string]interface{}
+
+		for _, n := range nodes {
+
+			ok := client.NewTestServiceClient(n.NodeAddr, n.NodePort, n.NodeTag)
+
+			nodeResult = append(nodeResult, map[string]interface{}{
+				"addr":  n.NodeAddr,
+				"name":  n.NodeName,
+				"state": !ok,
+			})
+		}
+
+		fmt.Println(nodeResult)
 
 		c.HTML(200, "nodes.tmpl.html", gin.H{
 			"globals":          GlobalData,
 			"CurrentPageTitle": "配置文件",
 			"CurrentPath":      c.FullPath(),
 			"User":             user,
+			"Nodes":            nodeResult,
 		})
 	}
 }

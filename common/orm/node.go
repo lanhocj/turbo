@@ -10,10 +10,21 @@ const (
 	LAVEL_USER_NORMAL
 )
 
+const (
+	ClientProxyMode_Trojan = "trojan"
+)
+
 type Node struct {
 	gorm.Model
 
-	Addr, Port, Tag string
+	NodeName string `json:"nodeName"`
+	NodeAddr string `json:"nodeAddr"`
+	NodePort string `json:"nodePort"`
+	NodeTag  string `json:"nodeTag"`
+
+	ClientAddr      string `json:"clientAddr"`
+	ClientPort      string `json:"clientPort"`
+	ClientProxyMode string `json:"clientProxyMode"`
 
 	Users []User `gorm:"many2many:node_user;"`
 }

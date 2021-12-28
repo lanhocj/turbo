@@ -16,6 +16,7 @@ func secretKeyGeneratorCommand() *cli.Command {
 	return &cli.Command{
 		Name:   "secret",
 		Action: secretKeyGeneratorActionHandler,
+		Usage:  "Create random secret key",
 	}
 }
 

@@ -1,6 +1,19 @@
 .node-item {
   padding: 1rem;
   display: flex;
+  border: 1px solid #eeeeee;
+
+
+  .node-name {
+    font-size: 1rem;
+  }
+
+  .node-extra {
+    list-style: none;
+    padding: 0;
+    margin-left: 0;
+    font-size: .825rem;
+  }
 
   .icon {
     margin-right: 1rem;

@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/laamho/turbo/app/service/rc"
 	"github.com/laamho/turbo/common"
+	"github.com/laamho/turbo/common/orm"
 	"github.com/xtls/xray-core/app/proxyman/command"
 	"google.golang.org/grpc"
 	"net"
@@ -11,7 +12,18 @@ import (
 
 func AddNodeHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		//client := r.NewServiceClient()
+		node := new(orm.Node)
+
+		if err := c.ShouldBindJSON(&node); err != nil {
+			c.JSON(406, gin.H{"message": "Invalid form", "form": node, "error": err.Error()})
+			c.Abort()
+			return
+		}
+
+		orm.DB().Create(&node)
+
+		c.JSON(200, node)
+		return
 	}
 }
 
@@ -25,7 +37,7 @@ func AddProxyHandler() gin.HandlerFunc {
 		}
 		client := command.NewHandlerServiceClient(conn)
 
-		res, err := rc.AddInboundProxy("trojan", "0.0.0.0", 8881, client)
+		res, err := rc.AddInboundProxy("trojan", "0.0.0.0", 10881, client)
 		common.Silent(err)
 
 		context.String(200, res.String())

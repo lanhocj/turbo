@@ -29,8 +29,14 @@
             </div>
 
             <div class="node-list">
-                <node-item></node-item>
-                <node-item></node-item>
+                {{range .Nodes }}
+                <node-item
+                        name="{{.name}}"
+                        addr="{{.addr}}"
+                        state="{{.state}}"
+                        port="{{.NodePort}}">
+                </node-item>
+                {{end}}
             </div>
         </section>
     </div>

@@ -18,6 +18,11 @@ type RPC struct {
 	client *rpc.Client
 }
 
+const (
+	CreateUserService = "Rpc.CreateUser"
+	RemoveUserService = "Rpc.RemoveUser"
+)
+
 func (p *RPC) Listen() error {
 	if err := rpc.RegisterName("Rpc", new(RpcService)); err != nil {
 		return err
@@ -47,7 +52,6 @@ func (p *RPC) Dial() error {
 	}
 
 	p.client = rpc.NewClientWithCodec(jsonrpc.NewClientCodec(conn))
-
 	return nil
 }
 

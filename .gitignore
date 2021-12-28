@@ -1,2 +1,4 @@
 .idea
 build
+# ignore vendor
+vendor

@@ -71,7 +71,7 @@ func removeSuperActionHandler(_ *cli.Context) error {
 		}
 	}
 
-	reply, err := l.Send("Rpc.RemoveUser", func() interface{} {
+	reply, err := l.Send(lpc.RemoveUserService, func() interface{} {
 		return lpc.UserLPCServiceObject{
 			Email: email,
 		}
@@ -126,7 +126,7 @@ func addSuperUserActionHandler(_ *cli.Context) error {
 
 	wait := make(chan string)
 	go func() {
-		reply, err := l.Send("Rpc.CreateUser", func() interface{} {
+		reply, err := l.Send(lpc.CreateUserService, func() interface{} {
 			return lpc.UserLPCServiceObject{
 				Email:    email,
 				Password: password,
@@ -135,7 +135,7 @@ func addSuperUserActionHandler(_ *cli.Context) error {
 		})
 
 		wait <- reply
-		common.Must(err)
+		common.Silent(err)
 	}()
 
 	r := <-wait

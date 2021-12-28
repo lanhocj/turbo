@@ -6,10 +6,6 @@ import (
 	"os"
 )
 
-func init() {
-	
-}
-
 func main() {
 	common.Must(cmd.RunApplicationWithArgs(os.Args))
 }

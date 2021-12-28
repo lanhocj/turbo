@@ -1,6 +1,8 @@
 import Vue from "vue";
 import {upperFirst, camelCase} from "lodash";
 import {popup} from "./extends";
+import {api} from "./axios";
+import {validate} from "./validate";
 
 const requireComponent = require.context(
     // 其组件目录的相对路径
@@ -27,6 +29,8 @@ requireComponent.keys().forEach(fileName => {
 })
 
 Vue.prototype.$popup = popup
+Vue.prototype.$api = api
+Vue.prototype.$validate = validate
 
 new Vue({
     el: "#main",
@@ -37,7 +41,7 @@ new Vue({
     },
     methods: {
         addNodePopup() {
-            this.$popup().toggle()
+            this.$popup()
         }
     }
 });

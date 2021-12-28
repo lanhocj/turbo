@@ -10,6 +10,10 @@ module.exports = {
     module: {
         rules: [
             {
+                test: /\.(sc|c)ss/,
+                use: [ 'vue-style-loader', 'css-loader', 'sass-loader' ]
+            },
+            {
                 test: /\.js/,
                 loader: 'babel-loader'
             },

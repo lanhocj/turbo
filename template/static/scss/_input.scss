@@ -4,6 +4,8 @@
 
 .form-control {
   @include margin-bottom(0.625rem);
+  display: inline-flex;
+  flex-direction: column;
 
   & > label {
     display: block;
@@ -11,6 +13,21 @@
     color: #999;
 
     @include margin-bottom(0.313rem);
+  }
+
+  &-group {
+    display: flex;
+    width: 100%;
+    flex: 1 1 100%;
+
+    & > .form-control {
+      margin-left: .5rem;
+
+      &:first-child {
+        margin-left: 0;
+        flex: 1;
+      }
+    }
   }
 
   .form-button {
@@ -22,20 +39,33 @@
     color: white;
     width: 100%;
     display: block;
+
+    &.cancel {
+      background: #c05252;
+    }
   }
 
-  .form-input > input {
-    border: 1px solid #ccc;
-    line-height: 1rem;
-    font-size: 0.875rem;
-    border-radius: 4px;
-    display: block;
+  .form-input {
     width: 100%;
-    padding: 0.5rem 0.625rem;
-    outline: none;
 
-    &:focus{
-      border-color: #333;
+    input {
+      border: 1px solid #ccc;
+      line-height: 1rem;
+      font-size: 0.875rem;
+      border-radius: 4px;
+      display: block;
+      width: 100%;
+      padding: 0.5rem 0.625rem;
+      outline: none;
+
+      &:focus{
+        border-color: #333;
+      }
+    }
+
+    .text-label {
+      font-size: .5rem;
+      color: #999999;
     }
   }
 }

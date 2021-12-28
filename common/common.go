@@ -16,3 +16,7 @@ func Silent(err error) {
 		log.Printf("error: %s\n", err.Error())
 	}
 }
+
+func WithResult(err error) bool {
+	return err != nil
+}

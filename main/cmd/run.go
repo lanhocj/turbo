@@ -7,6 +7,7 @@ import (
 	"github.com/laamho/turbo/common/orm"
 	"github.com/urfave/cli/v2"
 	"log"
+	"path/filepath"
 )
 
 func webServerCommand() *cli.Command {
@@ -23,8 +24,16 @@ func webServerCommand() *cli.Command {
 
 func serveActionHandler(c *cli.Context) error {
 	conf := config.New()
+	configFilePath := c.Path("config")
 
-	if err := conf.LoadFile(c.String("config")); err != nil {
+	switch ext := filepath.Ext(configFilePath); ext {
+	case ".yml", ".yaml":
+		break
+	default:
+		log.Fatalf("config file: %s does supported!", ext)
+	}
+
+	if err := conf.LoadFile(configFilePath); err != nil {
 		log.Fatal(err)
 	}
 

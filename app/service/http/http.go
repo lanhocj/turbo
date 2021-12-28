@@ -44,7 +44,8 @@ func StartWebApplication() error {
 
 	api := r.Group("api")
 	{
-		api.GET("/node", controller.AddNodeHandler())
+		api.POST("/addNode", controller.AddNodeHandler())
+		//api.GET("/createNode", controller.AddProxyHandler()) // 添加代理失败，原因未知。
 	}
 
 	log.Printf("Listen at %s\n", addr)
