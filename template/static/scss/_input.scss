@@ -72,4 +72,31 @@
       color: #999999;
     }
   }
+
+  .node-select-box {
+    padding: .5rem 0;
+    display: grid;
+    grid-column-gap: .2rem;
+    grid-template-columns: repeat(3, 1fr);
+    //grid-column-;
+    label {
+      input{
+        display: none;
+      }
+
+      .checkbox-control {
+        border: 1px solid #cccccc;
+        padding: .2rem .3rem;
+        font-size: .7rem;
+        display: block;
+        text-align: center;
+        border-radius: 4px;
+      }
+
+      input:checked + .checkbox-control {
+        background: #0db627;
+        color: white;
+      }
+    }
+  }
 }

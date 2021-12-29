@@ -16,6 +16,8 @@ func Authenticator() gin.HandlerFunc {
 		token := session.Get("token")
 		r := orm.DB().Model(user).Where("hash=?", token)
 
+		ctx.Set("currentUser", user)
+
 		if util.Empty(token) || errors.Is(r.Error, gorm.ErrRecordNotFound) {
 			ctx.Redirect(302, "/login")
 			return

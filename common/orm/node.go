@@ -51,6 +51,7 @@ type User struct {
 	Role     int    `json:"role" gorm:"role,omitempty"`
 	Hash     string `json:"-" gorm:"hash,omitempty"`
 	Token    string `json:"token"`
+	Locked   bool   `json:"locked"`
 
 	Nodes []Node `json:"nodes" gorm:"many2many:node_user;"`
 }

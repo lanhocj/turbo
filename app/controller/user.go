@@ -23,10 +23,20 @@ func UserListHandler() gin.HandlerFunc {
 		var users []orm.User
 		//var nodes []orm.Node
 		orm.DB().Model(&orm.User{}).Preload("Nodes").Find(&users)
+		var u *orm.User
+
+		curr, ok := c.Get("currentUser")
+		if ok {
+			u = curr.(*orm.User)
+		}
 
 		var r structs.UserListResponse
 
 		for _, user := range users {
+			if 1 != u.ID && user.ID == 1 {
+				continue
+			}
+
 			var un structs.NodeListResponse
 			var role string
 			switch user.Role {
@@ -47,7 +57,7 @@ func UserListHandler() gin.HandlerFunc {
 			u := &structs.UserResponse{
 				Email:   user.Email,
 				RoleId:  user.Role,
-				Locked:  orm.LAVEL_USER_BLOCK == user.Role,
+				Locked:  user.Locked,
 				IsAdmin: orm.LEVEL_USER_ADMIN == user.Role,
 				Role:    role,
 				NodeNum: len(user.Nodes),
@@ -167,27 +177,15 @@ func PutUserToNode() gin.HandlerFunc {
 			nids = append(nids, uint(c))
 		}
 
+		orm.DB().Model(&user).Association("Nodes").Clear()
 		var nodes []orm.Node
-		var allNodes []orm.Node
 		orm.DB().Model(&orm.Node{}).Find(&nodes, nids)
-		orm.DB().Find(&allNodes)
 		user.Nodes = nodes
+
 		role, _ := strconv.Atoi(requestData.Role)
 		user.Role = role
 
-		for _, node := range allNodes {
-			c := client.NewServiceClient(node.NodeAddr, node.NodePort)
-
-			if common.Combine(node.ID, nids) && user.Role != orm.LAVEL_USER_BLOCK {
-				if err := rc.AddUser(node.NodeTag, user.Email, user.Token, 1, c); err != nil {
-					common.Silent(err)
-				}
-			} else {
-				if err := rc.RemoveUser(node.NodeTag, user.Email, c); err != nil {
-					common.Silent(err)
-				}
-			}
-		}
+		go flushNodesByUser(user)
 
 		if r := orm.DB().Save(&user); r.Error == nil {
 			c.JSON(200, gin.H{"status": 2000, "message": "数据添加成功"})
@@ -196,6 +194,32 @@ func PutUserToNode() gin.HandlerFunc {
 
 		c.JSON(200, gin.H{"message": "数据添加失败"})
 		return
+	}
+}
+
+func flushNodesByUser(user *orm.User) {
+	var allNodes []orm.Node
+	orm.DB().Preload("Nodes").Model(user).First(&user)
+	orm.DB().Find(&allNodes)
+
+	var nids []uint
+
+	for _, node := range user.Nodes {
+		nids = append(nids, node.ID)
+	}
+
+	for _, node := range allNodes {
+		c := client.NewServiceClient(node.NodeAddr, node.NodePort)
+
+		if common.Combine(node.ID, nids) && user.Role != orm.LAVEL_USER_BLOCK {
+			if err := rc.AddUser(node.NodeTag, user.Email, user.Token, 1, c); err != nil {
+				common.Silent(err)
+			}
+		} else {
+			if err := rc.RemoveUser(node.NodeTag, user.Email, c); err != nil {
+				common.Silent(err)
+			}
+		}
 	}
 }
 

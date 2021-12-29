@@ -4,13 +4,18 @@ import (
 	"fmt"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"github.com/laamho/turbo/app/controller/structs"
 	"github.com/laamho/turbo/common/orm"
 	"github.com/laamho/turbo/common/util"
 	"github.com/xtls/xray-core/common/errors"
+	"github.com/xtls/xray-core/common/uuid"
 )
 
 func LoginHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		GlobalData.SetCurrentPath(c.FullPath())
+		GlobalData.SetCurrentTitle("登录")
+
 		c.HTML(200, "login.tmpl.html", gin.H{
 			"globals": GlobalData,
 		})
@@ -128,5 +133,62 @@ func NodesListHandler() gin.HandlerFunc {
 			"User":    user,
 			"Nodes":   nodeResult,
 		})
+	}
+}
+
+func SetUserLockHandler() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var request structs.GetNodeListRequest
+		if err := c.ShouldBindJSON(&request); err != nil {
+			c.AbortWithStatusJSON(200, gin.H{"message": "请求错误", "error": err.Error()})
+			return
+		}
+
+		user := new(orm.User)
+		if r := orm.DB().Model(user).Where("email=?", request.Email).First(&user); r.Error != nil {
+			c.AbortWithStatusJSON(200, gin.H{"message": "查询错误", "error": r.Error})
+			return
+		}
+		user.Locked = !user.Locked
+
+		if !user.Locked {
+			go flushNodesByUser(user)
+		}
+
+		if r := orm.DB().Save(&user); r.Error != nil {
+			c.AbortWithStatusJSON(200, gin.H{"message": "操作失败", "error": r.Error})
+			return
+		}
+
+		c.AsciiJSON(200, gin.H{"message": "成功"})
+		return
+	}
+}
+
+func FlushTokenHandler() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var request structs.GetNodeListRequest
+		if err := c.ShouldBindJSON(&request); err != nil {
+			c.AbortWithStatusJSON(200, gin.H{"message": "请求错误", "error": err.Error()})
+			return
+		}
+
+		user := new(orm.User)
+		if r := orm.DB().Model(user).Where("email=?", request.Email).First(&user); r.Error != nil {
+			c.AbortWithStatusJSON(200, gin.H{"message": "查询错误", "error": r.Error})
+			return
+		}
+		token := uuid.New()
+		user.Token = token.String()
+
+		go flushNodesByUser(user)
+
+		if r := orm.DB().Save(&user); r.Error != nil {
+			c.AbortWithStatusJSON(200, gin.H{"message": "操作失败", "error": r.Error})
+			return
+		}
+
+		c.AsciiJSON(200, gin.H{"message": "成功"})
+		return
 	}
 }

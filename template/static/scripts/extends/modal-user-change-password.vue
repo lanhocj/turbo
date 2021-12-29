@@ -51,6 +51,7 @@ export default {
 
       this.$api.post("/users/changeUserPassword", data).then(({ data }) => {
         alert("密码修改成功")
+        location.reload()
       })
       return e.preventDefault()
     }

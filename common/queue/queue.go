@@ -6,6 +6,7 @@ import (
 	"github.com/laamho/turbo/common"
 	"github.com/laamho/turbo/common/config"
 	"github.com/laamho/turbo/common/orm"
+	"log"
 	"time"
 )
 
@@ -14,6 +15,10 @@ func loader() {
 	orm.DB().Preload("Users").Find(&nodes)
 
 	lifetime := config.GetSyncLifetime()
+	if int(lifetime) == 0 {
+		log.Println("Sync Disabled!")
+		return
+	}
 
 	for _, node := range nodes {
 		c := client.NewServiceClient(node.NodeAddr, node.NodePort)

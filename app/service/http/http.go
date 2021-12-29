@@ -63,6 +63,8 @@ func StartWebApplication() error {
 			user.POST("/nodes", controller.GetNodeWithUser())
 			user.POST("/nodeSetting", controller.PutUserToNode())
 			user.POST("/changeUserPassword", controller.PutChangeUserPassword())
+			user.POST("/flushSetUserLockState", controller.SetUserLockHandler())
+			user.POST("/flushToken", controller.FlushTokenHandler())
 		}
 
 		//api.GET("/createNode", controller.AddProxyHandler()) // 添加代理失败，原因未知。

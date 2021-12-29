@@ -86,7 +86,7 @@ export default {
       }).then(r => {
         if (r.status == 2000) {
           alert(r.message)
-          return
+          location.reload()
         }
         location.reload()
       })

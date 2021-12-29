@@ -7,7 +7,7 @@
       <li class="node-num">节点数量</li>
       <li class="locked">状态</li>
     </div>
-    <user-list-item v-for="(item, index) in list" :index="index" :email="item.email" :node-num="item.nodeNum" :role="item.role" />
+    <user-list-item v-for="(item, index) in list" :index="index" :locked="item.locked" :email="item.email" :node-num="item.nodeNum" :role="item.role" />
   </div>
 </template>
 

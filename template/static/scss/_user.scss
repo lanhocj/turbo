@@ -37,6 +37,21 @@
       text-align: center;
       justify-content: center;
     }
+
+    .locked {
+      a {
+        background: #0db627;
+        color: white;
+        text-decoration: none;
+        font-size: .6rem;
+        padding: .2rem .3rem;
+
+        &.locked{
+          background: #c05252;
+          color: white;
+        }
+      }
+    }
   }
 
   .group {

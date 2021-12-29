@@ -6,6 +6,7 @@ import (
 	"github.com/laamho/turbo/common"
 	"github.com/laamho/turbo/common/orm"
 	"github.com/laamho/turbo/common/util"
+	"github.com/xtls/xray-core/common/uuid"
 	"log"
 	"net"
 	"net/rpc"
@@ -75,6 +76,8 @@ func (r *RpcService) CreateUser(req interface{}, res *string) error {
 	}
 
 	user.Password = util.Hash(user.Email, user.Password)
+	token := uuid.New()
+	user.Token = token.String()
 
 	log.Printf("Create user via command line [%s]", user.Email)
 	orm.DB().Create(&user)

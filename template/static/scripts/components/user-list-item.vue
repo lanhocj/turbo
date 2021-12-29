@@ -5,7 +5,9 @@
       <li class="email">{{ email }}</li>
       <li class="role">{{ role }}</li>
       <li class="node-num">{{ nodeNum }}</li>
-      <li class="locked">{{ locked ? '锁定' : '正常' }}</li>
+      <li class="locked">
+        <a :class="[ locked ? 'locked' : '' ]" @click="changeLockState" href="javascript:void(0);">{{ locked ? '锁定' : '正常' }}</a>
+      </li>
     </ul>
 
     <div class="group">
@@ -28,6 +30,14 @@ export default {
     changePassword() {
       console.log(this.email)
       this.$modalUserChangePassword({ email: this.email }).open()
+    },
+    changeLockState() {
+      let data = new FormData()
+      data.append("email", this.email)
+      this.$api.post("/users/flushSetUserLockState", data).then(({data}) => {
+        alert(data.message)
+        location.reload()
+      })
     },
     userSettings() {
       console.log(this.email)

@@ -135,6 +135,23 @@ h1, h2, h3, h4, h5, h6, p, li, ul {
     .form-control .form-input .text-label {
       font-size: .5rem;
       color: #999999; }
+  .form-control .node-select-box {
+    padding: .5rem 0;
+    display: grid;
+    grid-column-gap: .2rem;
+    grid-template-columns: repeat(3, 1fr); }
+    .form-control .node-select-box label input {
+      display: none; }
+    .form-control .node-select-box label .checkbox-control {
+      border: 1px solid #cccccc;
+      padding: .2rem .3rem;
+      font-size: .7rem;
+      display: block;
+      text-align: center;
+      border-radius: 4px; }
+    .form-control .node-select-box label input:checked + .checkbox-control {
+      background: #0db627;
+      color: white; }
 
 .modal {
   position: absolute;
@@ -202,6 +219,17 @@ h1, h2, h3, h4, h5, h6, p, li, ul {
       width: 4rem;
       text-align: center;
       justify-content: center; }
+    .user-item-header .locked a,
+    .user-item .user-item-info .locked a {
+      background: #0db627;
+      color: white;
+      text-decoration: none;
+      font-size: .6rem;
+      padding: .2rem .3rem; }
+      .user-item-header .locked a.locked,
+      .user-item .user-item-info .locked a.locked {
+        background: #c05252;
+        color: white; }
   .user-item .group {
     font-size: .7rem;
     padding: .5rem 0; }
