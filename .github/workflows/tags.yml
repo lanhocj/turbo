@@ -1,0 +1,40 @@
+name: build-project
+on:
+  push:
+    tags:
+      - 'v*'
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout codebase from github
+        uses: actions/checkout@master
+
+      - name: Setup Golang
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.16.6
+
+      - name: Get project dependencies
+        uses: go mod download
+
+      - name: Build project
+        run: |
+          mkdir -p build
+          go build -o build -trimpath -ldflags "-s -w -X main.release=production -buildid=" ./main
+
+      - name: Prepare to release
+        run: |
+          cp -r ${GITHUB_WORKSPACE}/exmaple ./build
+      - name: Create archive file
+        shell: bash
+        run: |
+          mkdir output
+          tar -zcvf ./output/turbo.tar.gz ./build
+
+      - name: Upload file to Artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: turbo.tar.gz
+          path: |
+            ./output/trubo.tar.gz
