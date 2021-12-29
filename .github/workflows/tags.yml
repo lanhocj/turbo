@@ -28,4 +28,4 @@ jobs:
         with:
           name: turbo.tar.gz
           path: |
-            ./output/turbo.tar
+            ./output/turbo.tar.gz
