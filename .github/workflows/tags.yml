@@ -25,7 +25,7 @@ jobs:
 
       - name: Prepare to release
         run: |
-          cp -r ${GITHUB_WORKSPACE}/exmaple ./build
+          cp -r ${GITHUB_WORKSPACE}/example ./build
       - name: Create archive file
         shell: bash
         run: |
