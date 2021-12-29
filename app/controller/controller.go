@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
-	"github.com/laamho/turbo/app/service/rc/client"
 	"github.com/laamho/turbo/common/orm"
 	"github.com/laamho/turbo/common/util"
 	"github.com/xtls/xray-core/common/errors"
@@ -38,7 +37,7 @@ func RequestLoginHandler() gin.HandlerFunc {
 		fmt.Println(user)
 		fmt.Printf("Id: %d, Email: [%s] and Password [%s]\n", user.ID, user.Email, user.Password)
 
-		if util.Vaild(email, password, user.Password) {
+		if util.Valid(email, password, user.Password) {
 			hash := util.SecretHash(email)
 			user.Hash = hash
 			result := orm.DB().Model(&user).Where("email=?", email).Update("hash", hash)
@@ -67,11 +66,17 @@ func IndexHandler() gin.HandlerFunc {
 		user := new(orm.User)
 		orm.DB().Where("hash", token).Find(&user)
 
+		scheme := "http"
+		if c.Request.TLS != nil {
+			scheme = "https"
+		}
+
 		c.HTML(200, "index.tmpl.html", gin.H{
 			"globals":          GlobalData,
 			"CurrentPageTitle": "配置文件",
 			"CurrentPath":      c.FullPath(),
 			"User":             user,
+			"Url":              fmt.Sprintf("%s://%s/c/%s", scheme, c.Request.Host, user.Token),
 		})
 		return
 	}
@@ -104,17 +109,14 @@ func NodesListHandler() gin.HandlerFunc {
 		var nodeResult []map[string]interface{}
 
 		for _, n := range nodes {
-
-			ok := client.NewTestServiceClient(n.NodeAddr, n.NodePort, n.NodeTag)
-
 			nodeResult = append(nodeResult, map[string]interface{}{
 				"addr":  n.NodeAddr,
 				"name":  n.NodeName,
-				"state": !ok,
+				"tag":   n.NodeTag,
+				"port":  n.NodePort,
+				"state": -1,
 			})
 		}
-
-		fmt.Println(nodeResult)
 
 		c.HTML(200, "nodes.tmpl.html", gin.H{
 			"globals":          GlobalData,

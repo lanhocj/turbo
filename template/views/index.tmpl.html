@@ -18,19 +18,17 @@
 
 <div class="content">
     <div class="wrapper">
-        <section class="section section-gray">
+        <section class="section">
             <div class="section-header">
-                <h1>当前用量 <sub>5分钟更新一次（当月）</sub></h1>
+                <h1 class="title">订阅信息</h1>
             </div>
 
             <div class="section-body">
-                <div class="traffic">
-                    <h1>1000 Kb</h1>
-                    <p>上传数据</p>
-                </div>
-                <div class="traffic">
-                    <h1>1000 Kb</h1>
-                    <p>下载数据</p>
+                <div class="form-control">
+                    <label>订阅信息</label>
+                    <div class="form-input">
+                        <input readonly value="{{.Url}}" type="text">
+                    </div>
                 </div>
             </div>
         </section>

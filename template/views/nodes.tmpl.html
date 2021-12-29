@@ -20,10 +20,10 @@
     <div class="wrapper">
         <section class="section">
             <div class="section-header">
-                <h1>服务器节点</h1>
+                <h1 class="title">服务器节点</h1>
 
                 <ul class="right-actions">
-                    <li><a @click="addNodePopup" href="javascript:void(0);">手动添加节点</a></li>
+                    <li><a @click="$modalAddNode().open()" href="javascript:void(0);">手动添加节点</a></li>
                     <li><a href="javascript:void(0);">安装脚本</a></li>
                 </ul>
             </div>
@@ -33,6 +33,7 @@
                 <node-item
                         name="{{.name}}"
                         addr="{{.addr}}"
+                        port="{{.port}}"
                         state="{{.state}}"
                         port="{{.NodePort}}">
                 </node-item>

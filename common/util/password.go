@@ -11,10 +11,11 @@ import (
 func Hash(email, in string) string {
 	h := hmac.New(sha256.New, []byte(email))
 	h.Write([]byte(in))
-	return hex.EncodeToString(h.Sum(nil))
+	enc := hex.EncodeToString(h.Sum(nil))
+	return enc
 }
 
-func Vaild(email, in, enc string) bool {
+func Valid(email, in, enc string) bool {
 	h := hmac.New(sha256.New, []byte(email))
 	h.Write([]byte(in))
 	expected := h.Sum(nil)

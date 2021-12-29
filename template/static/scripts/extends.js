@@ -1,26 +1,34 @@
-import Vue from "vue";
-import PopupAddNode from "./extends/popup-add-node";
+import camelCase from "lodash/camelCase";
 
-let PopupConstructor = Vue.extend(PopupAddNode)
+let requireComponent = require.context('./extends', false, /\w+\.(vue|js)$/)
 
-export const popup = (obj = {}) => {
-    let object = Object.assign({
-        title: "提示",
-        content: "确认吗？",
-        showCancelButton: false,
-        confirmText: "确定",
-        cancelText: "取消"
-    }, obj)
+export const VueExtendLoader = {
+    install(Vue, options) {
+        requireComponent.keys().forEach(fileName => {
+            let component = requireComponent(fileName)
 
-    let dom = new PopupConstructor({
-        el: document.createElement("div")
-    })
+            const name = camelCase(
+                // 获取和目录深度无关的文件名
+                fileName
+                    .split('/')
+                    .pop()
+                    .replace(/\.\w+$/, '')
+            )
 
-    document.body.appendChild(dom.$el)
+            let Constructor = Vue.extend(component.default || component)
 
-    Object.keys(object).forEach(key => {
-        if (dom.hasOwnProperty(key)) {
-            dom[key] = object[key]
-        }
-    })
+            Vue.prototype['$' + name] = (obj = {}) => {
+                let dom = new Constructor({
+                    el: document.createElement("dev")
+                })
+
+                Object.keys(obj).forEach(key => {
+                    dom[key] = obj[key]
+                })
+
+                document.body.appendChild(dom.$el)
+                return dom;
+            }
+        })
+    }
 }

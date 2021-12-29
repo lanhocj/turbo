@@ -1,0 +1,62 @@
+.user-item {
+  border-bottom: 1px solid #eeeeee;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+
+  &-header,
+  .user-item-info {
+    display: flex;
+    list-style: none;
+    padding: .5rem 0;
+    margin: 0;
+
+    & > li {
+      font-size: .7rem;
+      vertical-align: center;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .index {
+      width: 2rem;
+      text-align: center;
+    }
+
+    .email {
+      width: 8rem;
+    }
+
+    .role {
+      width: 3rem;
+      text-align: center;
+      justify-content: center;
+    }
+    .node-num {
+      width: 4rem;
+      text-align: center;
+      justify-content: center;
+    }
+  }
+
+  .group {
+    font-size: .7rem;
+    padding: .5rem 0;
+    a {
+      display: inline-flex;
+      align-content: center;
+      margin-left: 1rem;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+        color: #c05252;
+      }
+    }
+  }
+
+  &-header {
+    border-bottom: 2px solid #eeeeee;
+    font-weight: bold;
+  }
+}

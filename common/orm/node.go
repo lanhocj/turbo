@@ -1,6 +1,8 @@
 package orm
 
 import (
+	"context"
+	"github.com/xtls/xray-core/common/uuid"
 	"gorm.io/gorm"
 )
 
@@ -29,6 +31,10 @@ type Node struct {
 	Users []User `gorm:"many2many:node_user;"`
 }
 
+func (n *Node) Sync(c context.Context) {
+
+}
+
 type Token struct {
 	gorm.Model
 
@@ -40,10 +46,17 @@ type Token struct {
 type User struct {
 	gorm.Model
 
-	Email    string `json:"email" gorm:"email,omitempty"`
-	Password string `json:"-" gorm:"password,omitempty"`
+	Email    string `json:"email" gorm:"email,unique,omitempty"`
+	Password string `json:"password" gorm:"password,omitempty"`
 	Role     int    `json:"role" gorm:"role,omitempty"`
 	Hash     string `json:"-" gorm:"hash,omitempty"`
+	Token    string `json:"token"`
 
 	Nodes []Node `json:"nodes" gorm:"many2many:node_user;"`
+}
+
+func (u *User) BeforeCreate() {
+	r := uuid.New()
+	u.Token = r.String()
+	return
 }

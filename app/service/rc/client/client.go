@@ -3,7 +3,6 @@ package client
 import (
 	"context"
 	"fmt"
-	"github.com/laamho/turbo/common"
 	"github.com/xtls/xray-core/app/proxyman/command"
 	"github.com/xtls/xray-core/common/serial"
 	"google.golang.org/grpc"
@@ -29,19 +28,19 @@ func NewState(s string) {
 
 func NewServiceClient(ip, port string) command.HandlerServiceClient {
 	addr := net.JoinHostPort(ip, port)
-	conn, err := grpc.Dial(addr, grpc.WithInsecure())
-	common.Silent(err)
+	conn, _ := grpc.Dial(addr, grpc.WithInsecure())
 	return command.NewHandlerServiceClient(conn)
 }
 
 func NewTestServiceClient(ip, port, tag string) bool {
 	c := NewServiceClient(ip, port)
-	tag = strings.ToUpper(tag)
+	tag = strings.ToLower(tag)
 	_, err := c.AlterInbound(context.Background(), &command.AlterInboundRequest{
 		Tag:       tag,
 		Operation: serial.ToTypedMessage(&command.AddUserOperation{}),
 	})
+
 	// 如果 连接拒绝 返回 true..
-	ok, _ := regexp.MatchString(`connection refused`, err.Error())
+	ok, _ := regexp.MatchString(`Unavailable`, err.Error())
 	return ok
 }

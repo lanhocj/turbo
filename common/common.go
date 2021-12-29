@@ -20,3 +20,13 @@ func Silent(err error) {
 func WithResult(err error) bool {
 	return err != nil
 }
+
+func Combine(a uint, in []uint) bool {
+	for _, i := range in {
+		if i == a {
+			return true
+		}
+	}
+
+	return false
+}

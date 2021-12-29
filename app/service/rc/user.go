@@ -12,7 +12,7 @@ import (
 
 // AddUser to cluster through xray api
 func AddUser(tag, email, password string, level uint32, c command.HandlerServiceClient) error {
-	tag = strings.ToUpper(tag)
+	tag = strings.ToLower(tag)
 
 	resp, err := c.AlterInbound(context.Background(), &command.AlterInboundRequest{
 		Tag: tag,
@@ -22,7 +22,6 @@ func AddUser(tag, email, password string, level uint32, c command.HandlerService
 				Level: level,
 				Account: serial.ToTypedMessage(&trojan.Account{
 					Password: password,
-					Flow:     trojan.XRD,
 				}),
 			},
 		}),
@@ -38,7 +37,7 @@ func AddUser(tag, email, password string, level uint32, c command.HandlerService
 
 // RemoveUser to cluster through xray api
 func RemoveUser(tag, email string, c command.HandlerServiceClient) error {
-	tag = strings.ToUpper(tag)
+	tag = strings.ToLower(tag)
 
 	resp, err := c.AlterInbound(context.Background(), &command.AlterInboundRequest{
 		Tag: tag,

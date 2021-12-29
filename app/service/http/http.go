@@ -7,6 +7,7 @@ import (
 	"github.com/laamho/turbo/app/controller"
 	"github.com/laamho/turbo/app/service/middleware"
 	"github.com/laamho/turbo/common/config"
+	"github.com/laamho/turbo/common/queue"
 	"github.com/laamho/turbo/common/util"
 	"log"
 )
@@ -31,7 +32,7 @@ func StartWebApplication() error {
 		front.GET("/login", controller.LoginHandler())
 		front.POST("/login", controller.RequestLoginHandler())
 		front.GET("/register")
-		front.GET("/c/:id")
+		front.GET("/c/:token", controller.GetUserConfigPath())
 
 		front.Use(middleware.Authenticator())
 		{
@@ -42,11 +43,27 @@ func StartWebApplication() error {
 		}
 	}
 
-	api := r.Group("api")
+	api := r.Group("api", middleware.Authenticator())
 	{
-		api.POST("/addNode", controller.AddNodeHandler())
+		node := api.Group("/node")
+		{
+			node.POST("", controller.AddNodeHandler())
+			node.POST("/available", controller.NodeAvailableTestHandler())
+		}
+
+		user := api.Group("users")
+		{
+			user.GET("/", controller.UserListHandler())
+			user.POST("/create", controller.AddUserHandler())
+			user.POST("/nodes", controller.GetNodeWithUser())
+			user.POST("/nodeSetting", controller.PutUserToNode())
+			user.POST("/changeUserPassword", controller.PutChangeUserPassword())
+		}
+
 		//api.GET("/createNode", controller.AddProxyHandler()) // 添加代理失败，原因未知。
 	}
+
+	queue.SyncWithNodes()
 
 	log.Printf("Listen at %s\n", addr)
 	return r.Run(addr)

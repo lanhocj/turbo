@@ -2,6 +2,7 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/laamho/turbo/app/controller/structs"
 	"github.com/laamho/turbo/app/service/rc"
 	"github.com/laamho/turbo/common"
 	"github.com/laamho/turbo/common/orm"
@@ -15,8 +16,7 @@ func AddNodeHandler() gin.HandlerFunc {
 		node := new(orm.Node)
 
 		if err := c.ShouldBindJSON(&node); err != nil {
-			c.JSON(406, gin.H{"message": "Invalid form", "form": node, "error": err.Error()})
-			c.Abort()
+			structs.Error(c, 20001, gin.H{"message": "Invalid form", "form": node, "error": err.Error()})
 			return
 		}
 

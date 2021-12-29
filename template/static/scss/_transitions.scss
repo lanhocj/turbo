@@ -1,0 +1,19 @@
+
+.modal-fade-enter-active,
+.modal-fade-leave-active {
+  transition: background-color 300ms, opacity 200ms;
+
+  .modal-dialog {
+    transition: transform 300ms, opacity 200ms;
+  }
+}
+
+.modal-fade-enter,
+.modal-fade-leave-to {
+  background-color: rgba(white, 0);
+
+  .modal-dialog {
+    transform: translateY(-100px);
+    opacity: 0;
+  }
+}

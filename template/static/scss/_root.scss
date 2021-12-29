@@ -52,6 +52,11 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding-bottom: .5rem;
+
+    .title {
+      font-size: .825rem;
+    }
 
     .right-actions {
       list-style: none;

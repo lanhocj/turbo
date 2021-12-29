@@ -6,6 +6,12 @@ import (
 	"os"
 )
 
+var release bool
+
+func init() {
+	//gin.SetMode(gin.ReleaseMode)
+}
+
 func main() {
 	common.Must(cmd.RunApplicationWithArgs(os.Args))
 }

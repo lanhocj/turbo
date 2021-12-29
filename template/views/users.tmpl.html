@@ -18,12 +18,18 @@
 
 <div class="content">
     <div class="wrapper">
-        <section class="section section-gray">
+        <section class="section">
             <div class="section-header">
-                <h1>用户列表</h1>
+                <h1 class="title">用户列表</h1>
+
+                <ul class="right-actions">
+                    <li><a @click="$modalAddUser().open()" href="javascript:void(0);">添加用户</a></li>
+                </ul>
             </div>
 
-
+            <div class="section-body">
+                <user-list />
+            </div>
         </section>
     </div>
 </div>

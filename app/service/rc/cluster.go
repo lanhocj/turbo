@@ -2,7 +2,6 @@ package rc
 
 import (
 	"context"
-	"fmt"
 	"github.com/xtls/xray-core/app/proxyman"
 	"github.com/xtls/xray-core/app/proxyman/command"
 	"github.com/xtls/xray-core/common/net"
@@ -17,8 +16,6 @@ import (
 func AddInboundProxy(tag string, addr string, port net.Port, c command.HandlerServiceClient) (*command.AddInboundResponse, error) {
 	tag = strings.ToUpper(tag)
 	portRange := net.SinglePortRange(port)
-	fmt.Println(portRange)
-	//localAddr := net.ParseAddress(addr)
 
 	return c.AddInbound(context.Background(), &command.AddInboundRequest{
 		Inbound: &core.InboundHandlerConfig{

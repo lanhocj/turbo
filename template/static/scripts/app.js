@@ -1,6 +1,7 @@
 import Vue from "vue";
-import {upperFirst, camelCase} from "lodash";
-import {popup} from "./extends";
+import camelCase from "lodash/camelCase";
+import upperFirst from "lodash/upperFirst";
+import {modalAddNode, modalAddUser, VueExtendLoader} from "./extends";
 import {api} from "./axios";
 import {validate} from "./validate";
 
@@ -28,11 +29,14 @@ requireComponent.keys().forEach(fileName => {
     Vue.component(componentName, componentConfig.default || componentConfig)
 })
 
-Vue.prototype.$popup = popup
+Vue.use(VueExtendLoader)
+
+console.log(Vue.prototype)
+
 Vue.prototype.$api = api
 Vue.prototype.$validate = validate
 
-new Vue({
+let app = new Vue({
     el: "#main",
     data() {
         return {
@@ -40,8 +44,10 @@ new Vue({
         }
     },
     methods: {
-        addNodePopup() {
-            this.$popup()
+        modalAddNode() {
+            this.$modalAddNode().open()
         }
     }
 });
+
+console.log(app)

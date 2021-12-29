@@ -1,9 +1,9 @@
 <template>
-  <transition name="model-fade">
-    <div v-show="show" class="model">
-      <div class="model-dialog">
+  <transition name="modal-fade">
+    <div v-if="show" class="modal">
+      <div class="modal-dialog">
         <div class="dialog-header">
-          <h1>添加节点服务器</h1>
+          <h1>编辑节点服务器信息</h1>
         </div>
 
         <div class="dialog-body">
@@ -54,12 +54,12 @@
                 </div>
               </div>
             </div>
-            <div class="form-control-group">
-              <div class="form-control form-footer">
-                <button  class="form-button" type="submit">添加</button>
+            <div class="form-footer">
+              <div class="form-control">
+                <button class="form-button" type="submit">添加</button>
               </div>
-              <div class="form-control form-footer">
-                <button @click="close" class="form-button cancel" type="button">取消</button>
+              <div class="form-control">
+                <a @click="close" class="form-button cancel" href="javascript:void(0);">取消</a>
               </div>
             </div>
           </form>
@@ -72,13 +72,14 @@
 <script>
 export default {
   data: () => ({
-    show: true,
+    show: false,
     title: "",
     content: ""
   }),
+
   methods: {
-    toggle() {
-      this.show = !this.show
+    open() {
+      this.show = true
     },
     close() {
       this.show = false
@@ -86,7 +87,7 @@ export default {
     submit(event) {
       let data = new FormData(event.target);
 
-      this.$api.post("/addNode", data).then(res => {
+      this.$api.post("/node", data).then(res => {
         if (res.status == 200) {
           location.reload()
         }
@@ -100,18 +101,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss">
-.model-fade-enter-active,.model-fade-leave-active {
-  .model {
-    transition: background-color 300ms;
-    background-color: rgba(white, 0);
-  }
-}
-.model-fade-enter, .model-fade-leave-to {
-  .model {
-    transition: background-color 300ms;
-    background-color: rgba(white, .5);
-  }
-}
-</style>
