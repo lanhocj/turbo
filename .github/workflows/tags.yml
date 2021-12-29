@@ -37,4 +37,4 @@ jobs:
         with:
           name: turbo.tar.gz
           path: |
-            ./output/trubo.tar.gz
+            ./output/turbo.tar.gz
