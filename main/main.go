@@ -1,15 +1,18 @@
 package main
 
 import (
+	"github.com/gin-gonic/gin"
 	"github.com/laamho/turbo/common"
 	"github.com/laamho/turbo/main/cmd"
 	"os"
 )
 
-var release bool
+var release string
 
 func init() {
-	//gin.SetMode(gin.ReleaseMode)
+	if release == "production" {
+		gin.SetMode(gin.ReleaseMode)
+	}
 }
 
 func main() {
