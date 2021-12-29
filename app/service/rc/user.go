@@ -6,7 +6,6 @@ import (
 	"github.com/xtls/xray-core/common/protocol"
 	"github.com/xtls/xray-core/common/serial"
 	"github.com/xtls/xray-core/proxy/trojan"
-	"log"
 	"strings"
 )
 
@@ -14,7 +13,7 @@ import (
 func AddUser(tag, email, password string, level uint32, c command.HandlerServiceClient) error {
 	tag = strings.ToLower(tag)
 
-	resp, err := c.AlterInbound(context.Background(), &command.AlterInboundRequest{
+	_, err := c.AlterInbound(context.Background(), &command.AlterInboundRequest{
 		Tag: tag,
 		Operation: serial.ToTypedMessage(&command.AddUserOperation{
 			User: &protocol.User{
@@ -30,8 +29,6 @@ func AddUser(tag, email, password string, level uint32, c command.HandlerService
 	if err != nil {
 		return err
 	}
-
-	log.Printf("Ok, %s", resp.String())
 	return nil
 }
 
@@ -39,7 +36,7 @@ func AddUser(tag, email, password string, level uint32, c command.HandlerService
 func RemoveUser(tag, email string, c command.HandlerServiceClient) error {
 	tag = strings.ToLower(tag)
 
-	resp, err := c.AlterInbound(context.Background(), &command.AlterInboundRequest{
+	_, err := c.AlterInbound(context.Background(), &command.AlterInboundRequest{
 		Tag: tag,
 		Operation: serial.ToTypedMessage(&command.RemoveUserOperation{
 			Email: email,
@@ -49,7 +46,5 @@ func RemoveUser(tag, email string, c command.HandlerServiceClient) error {
 	if err != nil {
 		return err
 	}
-
-	log.Printf("Ok, %s", resp.String())
 	return nil
 }

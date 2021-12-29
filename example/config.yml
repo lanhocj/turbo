@@ -4,11 +4,14 @@ app:
   description: Turbo
   copyright: Laam Ho
   allowRegistration: false
+  TemplateDir: ""
+  StaticDir: ""
+  SyncLifetime: 10
 
 database:
   driver: mysql
   user: root
-  password: a003120
+  password:
   table: turbo
   host: localhost
   port: 3306

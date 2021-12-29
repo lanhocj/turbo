@@ -6,6 +6,7 @@ import (
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"net"
+	"time"
 )
 
 type Object struct {
@@ -25,10 +26,13 @@ type Object struct {
 	} `yaml:"http" json:"http"`
 
 	App struct {
-		Title       string `yaml:"title"`
-		Secret      string `yaml:"secret"`
-		Description string `yaml:"description"`
-		Copyright   string `yaml:"copyright"`
+		Title        string `yaml:"title"`
+		Secret       string `yaml:"secret"`
+		Description  string `yaml:"description"`
+		Copyright    string `yaml:"copyright"`
+		TemplateDir  string `yaml:"templateDir"`
+		StaticDir    string `yaml:"staticDir"`
+		SyncLifetime int64  `yaml:"syncLifetime"`
 	} `yaml:"app"`
 }
 
@@ -71,6 +75,10 @@ func GetAddr() string     { return cnf.GetAddr() }
 func GetDbDriver() string { return cnf.GetDbDriver() }
 func GetDSN() string      { return cnf.GetDSN() }
 func Copy() *Object       { return cnf }
+
+func GetTemplateDir() string         { return cnf.App.TemplateDir }
+func GetStaticDir() string           { return cnf.App.StaticDir }
+func GetSyncLifetime() time.Duration { return time.Duration(cnf.App.SyncLifetime) * time.Minute }
 
 func GetSecret() []byte {
 	dec, _ := base64.StdEncoding.DecodeString(cnf.getSecret())

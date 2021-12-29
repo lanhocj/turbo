@@ -18,8 +18,6 @@ type NodeState struct {
 
 func (s *NodeState) State() {}
 
-// rpc error: code = Unknown desc = app/proxyman/command: failed to get handler: PROXY > app/proxyman/inbound: handler not found: PROXY
-// rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing dial tcp 127.0.0.1:3333: connect: connection refused"
 func NewState(s string) {
 	re := regexp.MustCompile("code = (.+?) desc = (.+?):")
 	r := re.FindString(s)
