@@ -37,7 +37,9 @@ func serveActionHandler(c *cli.Context) error {
 		log.Fatal(err)
 	}
 
-	orm.Initialize()
+	if err := orm.Initialize(); err != nil {
+		log.Fatalf("数据库连接失败：%v\n", err.Error())
+	}
 
 	common.Must(orm.AutoMigrate(&orm.User{}, &orm.Node{}, &orm.Token{}))
 

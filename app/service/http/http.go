@@ -32,6 +32,7 @@ func StartWebApplication() error {
 		front.GET("/login", controller.LoginHandler())
 		front.POST("/login", controller.RequestLoginHandler())
 		front.GET("/register")
+		front.GET("/logout", controller.LogoutHandler())
 		front.GET("/c/:token", controller.GetUserConfigPath())
 
 		front.Use(middleware.Authenticator())

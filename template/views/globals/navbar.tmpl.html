@@ -1,0 +1,26 @@
+{{ define "globals/navbar.tmpl.html" }}
+{{ $curLink := .globals.CurrentPage }}
+{{ $userRole := .User.Role }}
+<header class="header">
+    <div class="wrapper">
+        <div class="header-nav">
+            <div class="primary-navbar">
+                <div class="logo">
+                    <h1><a href="">Turbo</a></h1>
+                </div>
+
+                <nav class="menus">
+                    {{ range .globals.Menus }}
+                    {{ $role := .Role }}
+                    {{ if or (eq $role -1) (eq $userRole $role) }}
+                    <a class="menu-item {{if eq .Link $curLink}}active{{end}}" href="{{.Link}}">{{.Name}}</a>
+                    {{ end }}
+                    {{ end }}
+                </nav>
+            </div>
+
+            <a href="/logout" class="logout">退出账户</a>
+        </div>
+    </div>
+</header>
+{{end}}

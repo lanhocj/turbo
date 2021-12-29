@@ -1,7 +1,6 @@
 package orm
 
 import (
-	"github.com/laamho/turbo/common"
 	"github.com/laamho/turbo/common/config"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/sqlite"
@@ -38,13 +37,12 @@ func DB() *gorm.DB {
 	return db
 }
 
-func Initialize() {
-	var err error
+func Initialize() (err error) {
 	obj := &Object{
 		Driver: config.GetDbDriver(),
 		DSN:    config.GetDSN(),
 	}
 
 	db, err = obj.open()
-	common.Must(err)
+	return
 }

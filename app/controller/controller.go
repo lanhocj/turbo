@@ -71,12 +71,13 @@ func IndexHandler() gin.HandlerFunc {
 			scheme = "https"
 		}
 
+		GlobalData.SetCurrentPath(c.FullPath())
+		GlobalData.SetCurrentTitle("配置文件")
+
 		c.HTML(200, "index.tmpl.html", gin.H{
-			"globals":          GlobalData,
-			"CurrentPageTitle": "配置文件",
-			"CurrentPath":      c.FullPath(),
-			"User":             user,
-			"Url":              fmt.Sprintf("%s://%s/c/%s", scheme, c.Request.Host, user.Token),
+			"globals": GlobalData,
+			"User":    user,
+			"Url":     fmt.Sprintf("%s://%s/c/%s", scheme, c.Request.Host, user.Token),
 		})
 		return
 	}
@@ -88,11 +89,12 @@ func UsersListHandler() gin.HandlerFunc {
 		user := new(orm.User)
 		orm.DB().Where("hash", token).Find(&user)
 
+		GlobalData.SetCurrentPath(c.FullPath())
+		GlobalData.SetCurrentTitle("用户管理")
+
 		c.HTML(200, "users.tmpl.html", gin.H{
-			"globals":          GlobalData,
-			"CurrentPageTitle": "配置文件",
-			"CurrentPath":      c.FullPath(),
-			"User":             user,
+			"globals": GlobalData,
+			"User":    user,
 		})
 	}
 }
@@ -118,12 +120,13 @@ func NodesListHandler() gin.HandlerFunc {
 			})
 		}
 
+		GlobalData.SetCurrentPath(c.FullPath())
+		GlobalData.SetCurrentTitle("节点管理")
+
 		c.HTML(200, "nodes.tmpl.html", gin.H{
-			"globals":          GlobalData,
-			"CurrentPageTitle": "配置文件",
-			"CurrentPath":      c.FullPath(),
-			"User":             user,
-			"Nodes":            nodeResult,
+			"globals": GlobalData,
+			"User":    user,
+			"Nodes":   nodeResult,
 		})
 	}
 }

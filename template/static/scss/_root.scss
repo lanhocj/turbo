@@ -31,10 +31,20 @@
   &-nav {
     display: flex;
     align-items: center;
+    justify-content: space-between;
 
     .logo {
       margin-right: 1rem;
     }
+
+    .primary-navbar {
+      display: flex;
+      align-items: center;
+    }
+  }
+
+  .logout {
+    font-size: .7rem;
   }
 }
 
@@ -45,6 +55,10 @@
 
   &-gray {
     background: #eee;
+  }
+
+  &-body {
+    padding: 1rem 0;
   }
 
   &-header {

@@ -3,8 +3,10 @@ package controller
 import (
 	"errors"
 	"fmt"
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/laamho/turbo/app/controller/structs"
+	"github.com/laamho/turbo/app/service/clash"
 	"github.com/laamho/turbo/app/service/rc"
 	"github.com/laamho/turbo/app/service/rc/client"
 	"github.com/laamho/turbo/common"
@@ -134,6 +136,19 @@ func GetNodeWithUser() gin.HandlerFunc {
 	}
 }
 
+func LogoutHandler() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		session := sessions.Default(c)
+		session.Clear()
+
+		if err := session.Save(); err != nil {
+			c.AbortWithStatus(500)
+			return
+		}
+		c.Redirect(302, "/login")
+	}
+}
+
 func PutUserToNode() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var requestData = structs.PutUserToNodeRequest{}
@@ -213,6 +228,14 @@ func GetUserConfigPath() gin.HandlerFunc {
 		token := c.Param("token")
 		user := new(orm.User)
 		orm.DB().Preload("Nodes").Model(user).Where("token=?", token).First(&user)
-		c.JSON(200, user)
+
+		obj := clash.Default()
+
+		for _, node := range user.Nodes {
+			obj.AddProxy("trojan", node.NodeName, node.ClientAddr, node.ClientPort, user.Token, false)
+		}
+
+		c.String(200, obj.String())
+		return
 	}
 }
