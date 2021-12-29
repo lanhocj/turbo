@@ -4,6 +4,7 @@
   "scripts": {
     "build:css": "gulp build:css",
     "build:js": "gulp build:js",
+    "build": "NODE_ENV=production gulp build",
     "watch": "gulp watch"
   },
   "devDependencies": {

@@ -1,0 +1,12 @@
+template/static/app.js
+template/static/app.css
+template/static/app.js.LICENSE.txt
+template/views/users.tmpl.html
+template/views/nodes.tmpl.html
+template/views/login.tmpl.html
+template/views/index.tmpl.html
+template/views/globals/header.tmpl.html
+template/views/globals/navbar.tmpl.html
+template/views/globals/footer.tmpl.html
+example/config.yml
+build/turbo

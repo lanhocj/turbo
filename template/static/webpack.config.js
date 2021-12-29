@@ -1,8 +1,9 @@
 const {VueLoaderPlugin} = require("vue-loader")
 
+const isProd = process.env.NODE_ENV === 'production'
 
 module.exports = {
-    mode: "development",
+    mode: isProd ? "production": "development",
     target: "web",
     output: {
         filename: "app.js"

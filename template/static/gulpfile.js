@@ -24,6 +24,8 @@ gulp.task("build:js", function (){
         .pipe(gulp.dest(outputDir))
 })
 
+gulp.task("build", gulp.series("build:css", "build:js"))
+
 gulp.task("watch", function() {
     gulp.watch(path.join(viewPath, '../*.html'))
     gulp.watch(scssFilesTarget, gulp.series("build:css"))
