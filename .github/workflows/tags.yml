@@ -16,7 +16,7 @@ jobs:
           go-version: 1.16.6
 
       - name: Get project dependencies
-        uses: go mod download
+        run: go mod download
 
       - name: Build project
         run: |
