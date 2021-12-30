@@ -151,10 +151,6 @@ func SetUserLockHandler() gin.HandlerFunc {
 		}
 		user.Locked = !user.Locked
 
-		if !user.Locked {
-			go flushNodesByUser(user)
-		}
-
 		if r := orm.DB().Save(&user); r.Error != nil {
 			c.AbortWithStatusJSON(200, gin.H{"message": "操作失败", "error": r.Error})
 			return
@@ -180,8 +176,6 @@ func FlushTokenHandler() gin.HandlerFunc {
 		}
 		token := uuid.New()
 		user.Token = token.String()
-
-		go flushNodesByUser(user)
 
 		if r := orm.DB().Save(&user); r.Error != nil {
 			c.AbortWithStatusJSON(200, gin.H{"message": "操作失败", "error": r.Error})

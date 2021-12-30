@@ -14,6 +14,7 @@ import (
 	"github.com/laamho/turbo/common/util"
 	"github.com/xtls/xray-core/common/uuid"
 	"gorm.io/gorm"
+	"log"
 	"strconv"
 	"strings"
 )
@@ -185,8 +186,6 @@ func PutUserToNode() gin.HandlerFunc {
 		role, _ := strconv.Atoi(requestData.Role)
 		user.Role = role
 
-		go flushNodesByUser(user)
-
 		if r := orm.DB().Save(&user); r.Error == nil {
 			c.JSON(200, gin.H{"status": 2000, "message": "数据添加成功"})
 			return
@@ -215,8 +214,6 @@ func RemoveUser() gin.HandlerFunc {
 			return
 		}
 
-		go flushNodesByUser(user)
-
 		c.AsciiJSON(200, gin.H{"message": "账户删除成功"})
 		return
 	}
@@ -225,9 +222,9 @@ func RemoveUser() gin.HandlerFunc {
 func flushNodesByUser(user *orm.User) {
 	email := user.Email
 
-	var allNodes []orm.Node
+	var allNodes []*orm.Node
 	orm.DB().Preload("Nodes").Model(user).Where("email=?", email).First(&user)
-	orm.DB().Find(&allNodes)
+	orm.DB().Model(&orm.Node{}).Find(&allNodes)
 
 	var nids []uint
 
@@ -239,12 +236,14 @@ func flushNodesByUser(user *orm.User) {
 		c := client.NewServiceClient(node.NodeAddr, node.NodePort)
 
 		if common.Combine(node.ID, nids) && user.Role != orm.LAVEL_USER_BLOCK {
-			if err := rc.AddUser(node.NodeTag, user.Email, user.Token, 1, c); err != nil {
+			if err := rc.AddUser(node.NodeTag, user.Email, user.Token, 0, c); err != nil {
 				common.Silent(err)
+				log.Printf("添加：[%s(%s)]->[%s]\n", user.Email, user.Token, node.NodeAddr)
 			}
 		} else {
 			if err := rc.RemoveUser(node.NodeTag, user.Email, c); err != nil {
 				common.Silent(err)
+				log.Printf("删除：[%s(%s)]->[%s]\n", user.Email, user.Token, node.NodeAddr)
 			}
 		}
 	}
@@ -283,6 +282,8 @@ func GetUserConfigPath() gin.HandlerFunc {
 			c.AbortWithStatus(404)
 			return
 		}
+
+		go flushNodesByUser(user)
 
 		obj := clash.Default()
 
