@@ -32,11 +32,16 @@ func NewServiceClient(ip, port string) command.HandlerServiceClient {
 
 func NewTestServiceClient(ip, port, tag string) bool {
 	c := NewServiceClient(ip, port)
+	//fmt.Printf("Dial Addr: %s\n", c)
 	tag = strings.ToLower(tag)
+	fmt.Printf("Dial Addr: %s:%s, Tag: %s\n", ip, port, tag)
+
 	_, err := c.AlterInbound(context.Background(), &command.AlterInboundRequest{
 		Tag:       tag,
 		Operation: serial.ToTypedMessage(&command.AddUserOperation{}),
 	})
+
+	fmt.Println(err.Error())
 
 	// 如果 连接拒绝 返回 true..
 	ok, _ := regexp.MatchString(`Unavailable`, err.Error())

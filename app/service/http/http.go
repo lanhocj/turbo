@@ -65,6 +65,7 @@ func StartWebApplication() error {
 			user.POST("/changeUserPassword", controller.PutChangeUserPassword())
 			user.POST("/flushSetUserLockState", controller.SetUserLockHandler())
 			user.POST("/flushToken", controller.FlushTokenHandler())
+			user.POST("/remove", controller.RemoveUser())
 		}
 
 		//api.GET("/createNode", controller.AddProxyHandler()) // 添加代理失败，原因未知。

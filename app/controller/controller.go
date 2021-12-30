@@ -188,7 +188,13 @@ func FlushTokenHandler() gin.HandlerFunc {
 			return
 		}
 
-		c.AsciiJSON(200, gin.H{"message": "成功"})
+		scheme := "http"
+		if c.Request.TLS != nil {
+			scheme = "https"
+		}
+
+		url := fmt.Sprintf("%s://%s/c/%s", scheme, c.Request.Host, user.Token)
+		c.AsciiJSON(200, gin.H{"message": "成功", "url": url})
 		return
 	}
 }

@@ -1,23 +1,12 @@
 {{ template "globals/header.tmpl.html" . }}
 {{ template "globals/navbar.tmpl.html" . }}
-
 <div class="content">
     <div class="wrapper">
-        <section class="section">
-            <div class="section-header">
-                <h1 class="title">订阅信息</h1>
-            </div>
+        <token-flush
+                email="{{.User.Email}}"
+                url="{{.Url}}">
 
-            <div class="section-body">
-                <div class="form-control">
-                    <div class="form-input">
-                        <input readonly value="{{.Url}}" type="text">
-                    </div>
-                </div>
-
-                <p>如果订阅不成功，请<a href="javascript:void(0)">刷新订阅</a>地址再次上市</p>
-            </div>
-        </section>
+        </token-flush>
     </div>
 </div>
 {{ template "globals/footer.tmpl.html" }}

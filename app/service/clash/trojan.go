@@ -83,6 +83,7 @@ func (c *Config) String() string {
 		"lancidr":      {Type: "http", Behavior: "domain", Url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/lancidr.txt", Path: "./ruleset/lancidr.yaml", Interval: 86400},
 		"cncidr":       {Type: "http", Behavior: "domain", Url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/cncidr.txt", Path: "./ruleset/cncidr.yaml", Interval: 86400},
 		"telegramcidr": {Type: "http", Behavior: "domain", Url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/telegramcidr.txt", Path: "./ruleset/telegramcidr.yaml", Interval: 86400},
+		"google":       {Type: "http", Behavior: "domain", Url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/google.txt", Path: "./ruleset/google.yaml", Interval: 86400},
 	}
 
 	c.Rules = []string{
@@ -90,6 +91,7 @@ func (c *Config) String() string {
 		"RULE-SET,direct,DIRECT",
 		"RULE-SET,lancidr,DIRECT",
 		"RULE-SET,cncidr,DIRECT",
+		"RULE-SET,google,PROXY",
 		"RULE-SET,telegramcidr,PROXY",
 		"GEOIP,CN,DIRECT,no-resolve",
 		"MATCH,PROXY",

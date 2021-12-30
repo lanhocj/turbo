@@ -13,6 +13,7 @@
     <div class="group">
       <a @click="changePassword" href="javascript:void(0);">修改密码</a>
       <a @click="userSettings" href="javascript:void(0);">设置用户</a>
+      <a @click="removeUser" href="javascript:void(0);">删除账户</a>
     </div>
   </div>
 </template>
@@ -38,6 +39,18 @@ export default {
         alert(data.message)
         location.reload()
       })
+    },
+    removeUser() {
+      let email = this.email
+      let data = new FormData()
+      data.append("email", this.email)
+
+      if (confirm(`确定删除 [${email}] 这个账户吗？`)) {
+        this.$api.post("/users/remove", data).then(({ data }) => {
+          alert(data.message)
+          location.reload()
+        })
+      }
     },
     userSettings() {
       console.log(this.email)

@@ -197,9 +197,36 @@ func PutUserToNode() gin.HandlerFunc {
 	}
 }
 
+func RemoveUser() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var request structs.GetNodeListRequest
+		if err := c.ShouldBindJSON(&request); err != nil {
+			c.AbortWithStatusJSON(200, gin.H{"message": "更新失败", "error": err.Error()})
+			return
+		}
+
+		user := new(orm.User)
+		if err := orm.DB().Model(&user).Where("email=?", request.Email).Association("Nodes").Clear(); err != nil {
+			common.Silent(err)
+		}
+
+		if r := orm.DB().Model(user).Where("email=?", request.Email).Delete(&user); errors.Is(r.Error, gorm.ErrRecordNotFound) {
+			c.AbortWithStatusJSON(200, gin.H{"message": "没有找到这个账户", "error": r.Error})
+			return
+		}
+
+		go flushNodesByUser(user)
+
+		c.AsciiJSON(200, gin.H{"message": "账户删除成功"})
+		return
+	}
+}
+
 func flushNodesByUser(user *orm.User) {
+	email := user.Email
+
 	var allNodes []orm.Node
-	orm.DB().Preload("Nodes").Model(user).First(&user)
+	orm.DB().Preload("Nodes").Model(user).Where("email=?", email).First(&user)
 	orm.DB().Find(&allNodes)
 
 	var nids []uint
@@ -251,7 +278,11 @@ func GetUserConfigPath() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token := c.Param("token")
 		user := new(orm.User)
-		orm.DB().Preload("Nodes").Model(user).Where("token=?", token).First(&user)
+
+		if r := orm.DB().Preload("Nodes").Model(user).Where("token=?", token).First(&user); errors.Is(r.Error, gorm.ErrRecordNotFound) {
+			c.AbortWithStatus(404)
+			return
+		}
 
 		obj := clash.Default()
 
