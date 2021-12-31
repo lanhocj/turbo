@@ -18,7 +18,6 @@ func AddUser(tag, email, password string, level uint32, c command.HandlerService
 		Operation: serial.ToTypedMessage(&command.AddUserOperation{
 			User: &protocol.User{
 				Email: email,
-				Level: level,
 				Account: serial.ToTypedMessage(&trojan.Account{
 					Password: password,
 					Flow:     trojan.XRD,

@@ -235,15 +235,17 @@ func flushNodesByUser(user *orm.User) {
 	for _, node := range allNodes {
 		c := client.NewServiceClient(node.NodeAddr, node.NodePort)
 
+		// 删除用户
+		if err := rc.RemoveUser(node.NodeTag, user.Email, c); err != nil {
+			common.Silent(err)
+			log.Printf("删除：[%s(%s)]->[%s]\n", user.Email, user.Token, node.NodeAddr)
+		}
+
+		// 刷新用户
 		if common.Combine(node.ID, nids) && user.Role != orm.LAVEL_USER_BLOCK {
 			if err := rc.AddUser(node.NodeTag, user.Email, user.Token, 0, c); err != nil {
 				common.Silent(err)
 				log.Printf("添加：[%s(%s)]->[%s]\n", user.Email, user.Token, node.NodeAddr)
-			}
-		} else {
-			if err := rc.RemoveUser(node.NodeTag, user.Email, c); err != nil {
-				common.Silent(err)
-				log.Printf("删除：[%s(%s)]->[%s]\n", user.Email, user.Token, node.NodeAddr)
 			}
 		}
 	}
