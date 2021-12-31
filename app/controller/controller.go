@@ -11,7 +11,7 @@ import (
 	"github.com/xtls/xray-core/common/uuid"
 )
 
-func LoginHandler() gin.HandlerFunc {
+func LoginViewHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		GlobalData.SetCurrentPath(c.FullPath())
 		GlobalData.SetCurrentTitle("登录")

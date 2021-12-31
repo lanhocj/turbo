@@ -33,7 +33,7 @@ func StartWebApplication() error {
 
 	front := r.Group("/")
 	{
-		front.GET("/login", controller.LoginHandler())
+		front.GET("/login", controller.LoginViewHandler())
 		front.POST("/login", controller.RequestLoginHandler())
 		front.GET("/register")
 		front.GET("/logout", controller.LogoutHandler())
