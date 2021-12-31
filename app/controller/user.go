@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
-	"github.com/laamho/turbo/app/controller/structs"
+	"github.com/laamho/turbo/app/controller/internal"
 	"github.com/laamho/turbo/app/service/clash"
 	"github.com/laamho/turbo/app/service/rc"
 	"github.com/laamho/turbo/app/service/rc/client"
@@ -31,14 +31,14 @@ func UserListHandler() gin.HandlerFunc {
 			u = curr.(*orm.User)
 		}
 
-		var r structs.UserListResponse
+		var r internal.UserListResponse
 
 		for _, user := range users {
 			if 1 != u.ID && user.ID == 1 {
 				continue
 			}
 
-			var un structs.NodeListResponse
+			var un internal.NodeListResponse
 			var role string
 			switch user.Role {
 			case orm.LEVEL_USER_ADMIN:
@@ -55,7 +55,7 @@ func UserListHandler() gin.HandlerFunc {
 				break
 			}
 
-			u := &structs.UserResponse{
+			u := &internal.UserResponse{
 				Email:   user.Email,
 				RoleId:  user.Role,
 				Locked:  user.Locked,
@@ -65,7 +65,7 @@ func UserListHandler() gin.HandlerFunc {
 			}
 
 			for _, node := range user.Nodes {
-				un = append(un, &structs.NodeResponse{
+				un = append(un, &internal.NodeResponse{
 					Addr:   node.ClientAddr,
 					Region: "不知道",
 				})
@@ -82,7 +82,7 @@ func UserListHandler() gin.HandlerFunc {
 
 func AddUserHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		requestUser := structs.UserCreateRequest{}
+		requestUser := internal.UserCreateRequest{}
 
 		if err := c.ShouldBindJSON(&requestUser); err != nil {
 			c.AbortWithStatusJSON(416, gin.H{"message": "表单提交错误", "error": err.Error()})
@@ -102,14 +102,14 @@ func AddUserHandler() gin.HandlerFunc {
 			return
 		}
 
-		structs.Error(c, 20001, gin.H{"message": fmt.Sprintf("账户 [%s] 已存在！", requestUser.Email)})
+		internal.Error(c, 20001, gin.H{"message": fmt.Sprintf("账户 [%s] 已存在！", requestUser.Email)})
 		return
 	}
 }
 
 func GetNodeWithUser() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		reqeustData := &structs.GetNodeListRequest{}
+		reqeustData := &internal.GetNodeListRequest{}
 		if err := c.ShouldBindJSON(&reqeustData); err != nil {
 			c.AbortWithStatusJSON(400, gin.H{"message": "请求错误", "error": err.Error()})
 			return
@@ -123,7 +123,7 @@ func GetNodeWithUser() gin.HandlerFunc {
 			common.Silent(r.Error)
 		}
 
-		var r structs.UserNodesResponse
+		var r internal.UserNodesResponse
 
 		var curUserNodes []uint
 
@@ -134,7 +134,7 @@ func GetNodeWithUser() gin.HandlerFunc {
 		fmt.Println(curUserNodes)
 
 		for _, node := range nodes {
-			n := &structs.UserNodeResponse{
+			n := &internal.UserNodeResponse{
 				Name:  node.NodeName,
 				ID:    node.ID,
 				Using: common.Combine(node.ID, curUserNodes),
@@ -162,7 +162,7 @@ func LogoutHandler() gin.HandlerFunc {
 
 func PutUserToNode() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var requestData = structs.PutUserToNodeRequest{}
+		var requestData = internal.PutUserToNodeRequest{}
 
 		if err := c.ShouldBindJSON(&requestData); err != nil {
 			c.AbortWithStatusJSON(200, gin.H{"data": requestData, "error": err.Error()})
@@ -186,6 +186,8 @@ func PutUserToNode() gin.HandlerFunc {
 		role, _ := strconv.Atoi(requestData.Role)
 		user.Role = role
 
+		go flushNodesByUser(user)
+
 		if r := orm.DB().Save(&user); r.Error == nil {
 			c.JSON(200, gin.H{"status": 2000, "message": "数据添加成功"})
 			return
@@ -198,7 +200,7 @@ func PutUserToNode() gin.HandlerFunc {
 
 func RemoveUser() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var request structs.GetNodeListRequest
+		var request internal.GetNodeListRequest
 		if err := c.ShouldBindJSON(&request); err != nil {
 			c.AbortWithStatusJSON(200, gin.H{"message": "更新失败", "error": err.Error()})
 			return
@@ -257,7 +259,7 @@ func flushNodesByUser(user *orm.User) {
 
 func PutChangeUserPassword() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var requestData = &structs.ChangePasswordRequest{}
+		var requestData = &internal.ChangePasswordRequest{}
 		if err := c.ShouldBindJSON(&requestData); err != nil {
 			c.AbortWithStatusJSON(200, gin.H{"data": requestData, "error": err.Error()})
 			return

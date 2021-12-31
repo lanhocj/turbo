@@ -29,6 +29,10 @@ func loader() {
 				if err := rc.AddUser(node.NodeTag, user.Email, user.Token, 1, c); err != nil {
 					common.Silent(err)
 				}
+			} else {
+				if err := rc.RemoveUser(node.NodeTag, user.Email, c); err != nil {
+					common.Silent(err)
+				}
 			}
 		}
 	}

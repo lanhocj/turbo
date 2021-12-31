@@ -1,4 +1,4 @@
-package structs
+package internal
 
 type UserResponse struct {
 	Email    string           `json:"email"`

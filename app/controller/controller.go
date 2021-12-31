@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
-	"github.com/laamho/turbo/app/controller/structs"
+	"github.com/laamho/turbo/app/controller/internal"
 	"github.com/laamho/turbo/common/orm"
 	"github.com/laamho/turbo/common/util"
 	"github.com/xtls/xray-core/common/errors"
@@ -138,7 +138,7 @@ func NodesListHandler() gin.HandlerFunc {
 
 func SetUserLockHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var request structs.GetNodeListRequest
+		var request internal.GetNodeListRequest
 		if err := c.ShouldBindJSON(&request); err != nil {
 			c.AbortWithStatusJSON(200, gin.H{"message": "请求错误", "error": err.Error()})
 			return
@@ -163,7 +163,7 @@ func SetUserLockHandler() gin.HandlerFunc {
 
 func FlushTokenHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var request structs.GetNodeListRequest
+		var request internal.GetNodeListRequest
 		if err := c.ShouldBindJSON(&request); err != nil {
 			c.AbortWithStatusJSON(200, gin.H{"message": "请求错误", "error": err.Error()})
 			return
@@ -181,6 +181,8 @@ func FlushTokenHandler() gin.HandlerFunc {
 			c.AbortWithStatusJSON(200, gin.H{"message": "操作失败", "error": r.Error})
 			return
 		}
+
+		go flushNodesByUser(user)
 
 		scheme := "http"
 		if c.Request.TLS != nil {
