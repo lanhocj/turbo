@@ -43,8 +43,5 @@ func RemoveUser(tag, email string, c command.HandlerServiceClient) error {
 		}),
 	})
 
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }

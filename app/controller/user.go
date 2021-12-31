@@ -234,18 +234,22 @@ func flushNodesByUser(user *orm.User) {
 
 	for _, node := range allNodes {
 		c := client.NewServiceClient(node.NodeAddr, node.NodePort)
+		tag := strings.ToLower(node.NodeTag)
 
 		// 删除用户
-		if err := rc.RemoveUser(node.NodeTag, user.Email, c); err != nil {
+		if err := rc.RemoveUser(tag, user.Email, c); err != nil {
 			common.Silent(err)
-			log.Printf("删除：[%s(%s)]->[%s]\n", user.Email, user.Token, node.NodeAddr)
+		} else {
+			log.Printf("成功删除：[%s(%s)]->[%s]\n", user.Email, user.Token, node.NodeAddr)
 		}
 
 		// 刷新用户
 		if common.Combine(node.ID, nids) && user.Role != orm.LAVEL_USER_BLOCK {
-			if err := rc.AddUser(node.NodeTag, user.Email, user.Token, 0, c); err != nil {
+			if err := rc.AddUser(tag, user.Email, user.Token, 0, c); err != nil {
 				common.Silent(err)
-				log.Printf("添加：[%s(%s)]->[%s]\n", user.Email, user.Token, node.NodeAddr)
+				log.Printf("用户添加失败：[%s(%s)] error: %s \n", user.Email, node.NodeAddr, err.Error())
+			} else {
+				log.Printf("用户添加失败：[%s(%s)]->[%s]\n", user.Email, user.Token, node.NodeAddr)
 			}
 		}
 	}
