@@ -1,45 +1,46 @@
 package controller
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/laamho/turbo/app/controller/internal"
-	"github.com/laamho/turbo/app/service/rc"
+	"github.com/laamho/turbo/app/service/transport"
+	"github.com/laamho/turbo/app/service/transport/client"
 	"github.com/laamho/turbo/common"
 	"github.com/laamho/turbo/common/orm"
-	"github.com/xtls/xray-core/app/proxyman/command"
-	"google.golang.org/grpc"
-	"net"
+	"log"
+	"strings"
 )
 
-func AddNodeHandler() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		node := new(orm.Node)
+func refreshNodesByUser(user *orm.User) {
+	email := user.Email
 
-		if err := c.ShouldBindJSON(&node); err != nil {
-			internal.Error(c, 20001, gin.H{"message": "Invalid form", "form": node, "error": err.Error()})
-			return
-		}
+	var allNodes []*orm.Node
+	orm.DB().Preload("Nodes").Model(user).Where("email=?", email).First(&user)
+	orm.DB().Model(&orm.Node{}).Find(&allNodes)
 
-		orm.DB().Create(&node)
+	var nids []uint
 
-		c.JSON(200, node)
-		return
+	for _, node := range user.Nodes {
+		nids = append(nids, node.ID)
 	}
-}
 
-// AddProxyHandler error.
-func AddProxyHandler() gin.HandlerFunc {
-	return func(context *gin.Context) {
-		srv := net.JoinHostPort("127.0.0.1", "3333")
-		conn, err := grpc.Dial(srv, grpc.WithInsecure())
-		if err != nil {
-			context.AbortWithError(500, err)
+	for _, node := range allNodes {
+		c := client.NewServiceClient(node.NodeAddr, node.NodePort)
+		tag := strings.ToLower(node.NodeTag)
+
+		// 删除用户
+		if err := transport.RemoveUser(tag, user.Email, c); err != nil {
+			common.Silent(err)
+		} else {
+			log.Printf("成功删除：[%s(%s)]->[%s]\n", user.Email, user.Token, node.NodeAddr)
 		}
-		client := command.NewHandlerServiceClient(conn)
 
-		res, err := rc.AddInboundProxy("trojan", "0.0.0.0", 10881, client)
-		common.Silent(err)
-
-		context.String(200, res.String())
+		// 刷新用户
+		if common.Combine(node.ID, nids) && user.Role != orm.LAVEL_USER_BLOCK {
+			if err := transport.AddUser(tag, user.Email, user.Token, 0, c); err != nil {
+				common.Silent(err)
+				log.Printf("用户添加失败：[%s(%s)] error: %s \n", user.Email, node.NodeAddr, err.Error())
+			} else {
+				log.Printf("用户添加失败：[%s(%s)]->[%s]\n", user.Email, user.Token, node.NodeAddr)
+			}
+		}
 	}
 }

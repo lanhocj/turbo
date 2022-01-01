@@ -1,8 +1,8 @@
 package queue
 
 import (
-	"github.com/laamho/turbo/app/service/rc"
-	"github.com/laamho/turbo/app/service/rc/client"
+	"github.com/laamho/turbo/app/service/transport"
+	"github.com/laamho/turbo/app/service/transport/client"
 	"github.com/laamho/turbo/common"
 	"github.com/laamho/turbo/common/config"
 	"github.com/laamho/turbo/common/orm"
@@ -26,11 +26,11 @@ func loader() {
 
 		for _, user := range node.Users {
 			if user.Role != orm.LAVEL_USER_BLOCK {
-				if err := rc.AddUser(node.NodeTag, user.Email, user.Token, 1, c); err != nil {
+				if err := transport.AddUser(node.NodeTag, user.Email, user.Token, 1, c); err != nil {
 					common.Silent(err)
 				}
 			} else {
-				if err := rc.RemoveUser(node.NodeTag, user.Email, c); err != nil {
+				if err := transport.RemoveUser(node.NodeTag, user.Email, c); err != nil {
 					common.Silent(err)
 				}
 			}

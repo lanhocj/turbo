@@ -12,8 +12,17 @@ jobs:
       - uses: actions/setup-go@v2
         with:
           go-version: 1.16.6
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 16
 
-      - name: Build project
+      - name: Building static files
+        run: |
+          cd ${GITHUB_WORKSPACE}/template/static
+          npm install
+          npm run build
+
+      - name: Building project
         run: make build
 
       - name: Upload file to Artifacts

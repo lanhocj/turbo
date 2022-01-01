@@ -49,7 +49,7 @@ export default {
     submit(e) {
       let data = new FormData(e.target)
 
-      this.$api.post("/users/changeUserPassword", data).then(({ data }) => {
+      this.$api.post("/users/change-password", data).then(({ data }) => {
         alert("密码修改成功")
         location.reload()
       })

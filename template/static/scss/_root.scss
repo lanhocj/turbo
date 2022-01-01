@@ -85,7 +85,22 @@
         }
 
         a {
+          display: inline-flex;
           text-decoration: none;
+          align-items: center;
+          color: #376eb9;
+          padding: .2rem .4rem;
+
+          & svg {
+            margin-right: .2rem;
+            margin-top: -1px;
+          }
+
+          &:hover {
+            background: #376eb9;
+            color: white;
+            border-radius: 2px;
+          }
         }
       }
     }

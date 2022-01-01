@@ -3,11 +3,18 @@
     <div class="user-item-header">
       <li class="index">ID</li>
       <li class="email">邮箱地址</li>
-      <li class="role">权限</li>
       <li class="node-num">节点数量</li>
-      <li class="locked">状态</li>
     </div>
-    <user-list-item v-for="(item, index) in list" :index="index" :locked="item.locked" :email="item.email" :node-num="item.nodeNum" :role="item.role" />
+    <user-list-item v-for="(item, index) in list"
+                    :key="index"
+                    :index="index"
+                    :locked="item.locked"
+                    :token="item.token"
+                    :email="item.email"
+                    :node-num="item.nodeNum"
+                    :role="item.role"
+                    :role-id="item.roleId"
+    />
   </div>
 </template>
 

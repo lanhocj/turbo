@@ -29,13 +29,9 @@ func StartWebApplication() error {
 	r.Use(sessions.Sessions("turbo", store))
 	addr := config.GetAddr()
 
-	controller.GlobalData.Init()
-
 	front := r.Group("/")
 	{
 		front.GET("/login", controller.LoginViewHandler())
-		front.POST("/login", controller.RequestLoginHandler())
-		front.GET("/register")
 		front.GET("/logout", controller.LogoutHandler())
 		front.GET("/c/:token", controller.GetUserConfigPath())
 
@@ -48,24 +44,30 @@ func StartWebApplication() error {
 		}
 	}
 
-	api := r.Group("api", middleware.Authenticator())
+	api := r.Group("api")
 	{
-		node := api.Group("/node")
-		{
-			node.POST("", controller.AddNodeHandler())
-			node.POST("/available", controller.NodeAvailableTestHandler())
-		}
 
-		user := api.Group("users")
+		api.POST("/login", controller.RequestLoginHandler())
+
+		api.Use(middleware.Authenticator())
 		{
-			user.GET("/", controller.UserListHandler())
-			user.POST("/create", controller.AddUserHandler())
-			user.POST("/nodes", controller.GetNodeWithUser())
-			user.POST("/nodeSetting", controller.PutUserToNode())
-			user.POST("/changeUserPassword", controller.PutChangeUserPassword())
-			user.POST("/flushSetUserLockState", controller.SetUserLockHandler())
-			user.POST("/flushToken", controller.FlushTokenHandler())
-			user.POST("/remove", controller.RemoveUser())
+			node := api.Group("/node")
+			{
+				node.POST("", controller.NodeAddHandler())
+				node.POST("/available", controller.NodeAvailableTestHandler())
+			}
+
+			user := api.Group("users")
+			{
+				user.GET("/", controller.UserListHandler())
+				user.POST("/create", controller.UserAddHandler())
+				user.POST("/nodes", controller.UserNodesHandler())
+				user.POST("/setting", controller.UserSettingHandler())
+				user.POST("/change-password", controller.UserPasswordChangeHandler())
+				user.POST("/lock", controller.UserLockHandler())
+				user.POST("/token-refresh", controller.UserTokenRefreshHandler())
+				user.POST("/remove", controller.UserRemoveHandler())
+			}
 		}
 
 		//api.GET("/createNode", controller.AddProxyHandler()) // 添加代理失败，原因未知。

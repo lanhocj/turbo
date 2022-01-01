@@ -1,23 +1,27 @@
 package controller
 
 import (
+	"errors"
 	"fmt"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/laamho/turbo/app/controller/internal"
 	"github.com/laamho/turbo/common/orm"
 	"github.com/laamho/turbo/common/util"
-	"github.com/xtls/xray-core/common/errors"
 	"github.com/xtls/xray-core/common/uuid"
+	"gorm.io/gorm"
 )
+
+var globals *internal.GlobalPageData
+
+func init() {
+	globals = internal.Glob.Init()
+}
 
 func LoginViewHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		GlobalData.SetCurrentPath(c.FullPath())
-		GlobalData.SetCurrentTitle("登录")
-
 		c.HTML(200, "login.tmpl.html", gin.H{
-			"globals": GlobalData,
+			"globals": globals,
 		})
 	}
 }
@@ -25,43 +29,43 @@ func LoginViewHandler() gin.HandlerFunc {
 func RequestLoginHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		session := sessions.Default(c)
-		var email, password string
-		var ok bool
-		if email, ok = c.GetPostForm("email"); !ok {
-			c.AbortWithError(401, errors.New("请输入登录邮箱"))
-		}
+		request := new(internal.RequestWithEmailAndPassword)
 
-		if password, ok = c.GetPostForm("password"); !ok {
-			c.AbortWithError(401, errors.New("请输入登录密码"))
+		if err := c.ShouldBindJSON(&request); err != nil {
+			c.AbortWithStatusJSON(401, gin.H{"message": "表单错误"})
+			return
 		}
 
 		user := new(orm.User)
 
-		orm.DB().Where("email = ?", email).Find(&user)
-		fmt.Printf("获取到的 orm.User 数据: \n")
-		fmt.Println(user)
-		fmt.Printf("Id: %d, Email: [%s] and Password [%s]\n", user.ID, user.Email, user.Password)
+		if obj := orm.DB().Where("email = ?", request.Email).Find(&user); errors.Is(obj.Error, gorm.ErrRecordNotFound) {
+			c.AbortWithStatusJSON(200, gin.H{"message": "账户登录失败，请核对登录邮箱或密码"})
+			return
+		}
 
-		if util.Valid(email, password, user.Password) {
-			hash := util.SecretHash(email)
+		if util.Valid(request.Email, request.Password, user.Password) {
+			hash := util.SecretHash(request.Email)
 			user.Hash = hash
-			result := orm.DB().Model(&user).Where("email=?", email).Update("hash", hash)
 
-			if result.Error != nil {
-				c.AbortWithError(500, result.Error)
+			if obj := orm.DB().Model(&user).Where("email=?", request.Email).Update("hash", hash); obj.Error != nil {
+				fmt.Println(obj)
+				c.AbortWithStatusJSON(200, gin.H{"message": "登录失败，请稍后再试"})
 				return
 			}
 
 			session.Set("token", hash)
+
 			if err := session.Save(); err != nil {
-				c.AbortWithError(500, err)
+				c.AbortWithStatusJSON(200, gin.H{"message": "账户登录失败，请核对登录邮箱或密码"})
+				return
 			}
 
 			c.Redirect(302, "/")
 			return
 		}
 
-		c.String(200, fmt.Sprintf("登录账户 [%s] 失败", email))
+		c.AbortWithStatusJSON(200, gin.H{"message": "账户登录失败，请核对登录邮箱或密码"})
+		return
 	}
 }
 
@@ -76,11 +80,11 @@ func IndexHandler() gin.HandlerFunc {
 			scheme = "https"
 		}
 
-		GlobalData.SetCurrentPath(c.FullPath())
-		GlobalData.SetCurrentTitle("配置文件")
+		globals.SetCurrentPath(c.FullPath())
+		globals.SetCurrentTitle("配置文件")
 
 		c.HTML(200, "index.tmpl.html", gin.H{
-			"globals": GlobalData,
+			"globals": globals,
 			"User":    user,
 			"Url":     fmt.Sprintf("%s://%s/c/%s", scheme, c.Request.Host, user.Token),
 		})
@@ -94,11 +98,11 @@ func UsersListHandler() gin.HandlerFunc {
 		user := new(orm.User)
 		orm.DB().Where("hash", token).Find(&user)
 
-		GlobalData.SetCurrentPath(c.FullPath())
-		GlobalData.SetCurrentTitle("用户管理")
+		globals.SetCurrentPath(c.FullPath())
+		globals.SetCurrentTitle("用户管理")
 
 		c.HTML(200, "users.tmpl.html", gin.H{
-			"globals": GlobalData,
+			"globals": globals,
 			"User":    user,
 		})
 	}
@@ -125,20 +129,21 @@ func NodesListHandler() gin.HandlerFunc {
 			})
 		}
 
-		GlobalData.SetCurrentPath(c.FullPath())
-		GlobalData.SetCurrentTitle("节点管理")
+		globals.SetCurrentPath(c.FullPath())
+		globals.SetCurrentTitle("节点管理")
 
 		c.HTML(200, "nodes.tmpl.html", gin.H{
-			"globals": GlobalData,
+			"globals": globals,
 			"User":    user,
 			"Nodes":   nodeResult,
 		})
 	}
 }
 
-func SetUserLockHandler() gin.HandlerFunc {
+func UserLockHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var request internal.GetNodeListRequest
+		request := new(internal.RequestWithEmail)
+
 		if err := c.ShouldBindJSON(&request); err != nil {
 			c.AbortWithStatusJSON(200, gin.H{"message": "请求错误", "error": err.Error()})
 			return
@@ -161,9 +166,9 @@ func SetUserLockHandler() gin.HandlerFunc {
 	}
 }
 
-func FlushTokenHandler() gin.HandlerFunc {
+func UserTokenRefreshHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var request internal.GetNodeListRequest
+		request := new(internal.RequestWithEmail)
 		if err := c.ShouldBindJSON(&request); err != nil {
 			c.AbortWithStatusJSON(200, gin.H{"message": "请求错误", "error": err.Error()})
 			return
@@ -182,7 +187,7 @@ func FlushTokenHandler() gin.HandlerFunc {
 			return
 		}
 
-		go flushNodesByUser(user)
+		go refreshNodesByUser(user)
 
 		scheme := "http"
 		if c.Request.TLS != nil {

@@ -5,13 +5,23 @@
     </div>
 
     <div class="section-body">
+      <div class="view">
+        <h1>手机扫描二维码</h1>
+        <div>
+          <img :src="qrcodeUrl" alt="">
+        </div>
+      </div>
+
+      <hr />
+
+
       <div class="form-control">
         <div class="form-input">
           <input readonly :value="currentUrl" type="text">
         </div>
       </div>
 
-      <p>如果订阅不成功，请<a @click="flushToken" href="javascript:void(0)">刷新订阅</a>地址再次上市</p>
+      <p>如果订阅不成功，请<a @click="flushToken" href="javascript:void(0)">刷新订阅</a>地址再次尝试</p>
     </div>
   </section>
 </template>
@@ -35,11 +45,19 @@ export default {
       data.append("email", email)
 
       if (confirm("确定需要更新订阅地址吗？")) {
-        this.$api.post("users/flushToken", data).then(({data}) => {
+        this.$api.post("users/token-refresh", data).then(({data}) => {
           this.currentUrl = data.url
           location.reload()
         })
       }
+    }
+  },
+  computed: {
+    qrcodeUrl() {
+      let url = window.btoa(this.currentUrl)
+      let name = window.encodeURI("Turbo 代理")
+      let data = `sub://${url}#${name}`
+      return `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${data}`
     }
   }
 }

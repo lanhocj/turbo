@@ -8,6 +8,7 @@ type UserResponse struct {
 	Role     string           `json:"role"`
 	NodeNum  int              `json:"nodeNum"`
 	NodeList NodeListResponse `json:"nodeList"`
+	Token    string           `json:"token"`
 }
 
 type UserCreateRequest struct {
@@ -21,11 +22,11 @@ type UserNodeResponse struct {
 	ID    uint   `json:"id"`
 	Using bool   `json:"using"`
 }
-type GetNodeListRequest struct {
+type RequestWithEmail struct {
 	Email string `json:"email"`
 }
 
-type ChangePasswordRequest struct {
+type RequestWithEmailAndPassword struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }

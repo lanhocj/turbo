@@ -7,14 +7,11 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/laamho/turbo/app/controller/internal"
 	"github.com/laamho/turbo/app/service/clash"
-	"github.com/laamho/turbo/app/service/rc"
-	"github.com/laamho/turbo/app/service/rc/client"
 	"github.com/laamho/turbo/common"
 	"github.com/laamho/turbo/common/orm"
 	"github.com/laamho/turbo/common/util"
 	"github.com/xtls/xray-core/common/uuid"
 	"gorm.io/gorm"
-	"log"
 	"strconv"
 	"strings"
 )
@@ -62,6 +59,7 @@ func UserListHandler() gin.HandlerFunc {
 				IsAdmin: orm.LEVEL_USER_ADMIN == user.Role,
 				Role:    role,
 				NodeNum: len(user.Nodes),
+				Token:   user.Token,
 			}
 
 			for _, node := range user.Nodes {
@@ -80,7 +78,7 @@ func UserListHandler() gin.HandlerFunc {
 	}
 }
 
-func AddUserHandler() gin.HandlerFunc {
+func UserAddHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		requestUser := internal.UserCreateRequest{}
 
@@ -107,9 +105,9 @@ func AddUserHandler() gin.HandlerFunc {
 	}
 }
 
-func GetNodeWithUser() gin.HandlerFunc {
+func UserNodesHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		reqeustData := &internal.GetNodeListRequest{}
+		reqeustData := &internal.RequestWithEmail{}
 		if err := c.ShouldBindJSON(&reqeustData); err != nil {
 			c.AbortWithStatusJSON(400, gin.H{"message": "请求错误", "error": err.Error()})
 			return
@@ -160,7 +158,7 @@ func LogoutHandler() gin.HandlerFunc {
 	}
 }
 
-func PutUserToNode() gin.HandlerFunc {
+func UserSettingHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var requestData = internal.PutUserToNodeRequest{}
 
@@ -186,7 +184,7 @@ func PutUserToNode() gin.HandlerFunc {
 		role, _ := strconv.Atoi(requestData.Role)
 		user.Role = role
 
-		go flushNodesByUser(user)
+		go refreshNodesByUser(user)
 
 		if r := orm.DB().Save(&user); r.Error == nil {
 			c.JSON(200, gin.H{"status": 2000, "message": "数据添加成功"})
@@ -198,9 +196,10 @@ func PutUserToNode() gin.HandlerFunc {
 	}
 }
 
-func RemoveUser() gin.HandlerFunc {
+func UserRemoveHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var request internal.GetNodeListRequest
+		request := new(internal.RequestWithEmail)
+
 		if err := c.ShouldBindJSON(&request); err != nil {
 			c.AbortWithStatusJSON(200, gin.H{"message": "更新失败", "error": err.Error()})
 			return
@@ -221,57 +220,21 @@ func RemoveUser() gin.HandlerFunc {
 	}
 }
 
-func flushNodesByUser(user *orm.User) {
-	email := user.Email
-
-	var allNodes []*orm.Node
-	orm.DB().Preload("Nodes").Model(user).Where("email=?", email).First(&user)
-	orm.DB().Model(&orm.Node{}).Find(&allNodes)
-
-	var nids []uint
-
-	for _, node := range user.Nodes {
-		nids = append(nids, node.ID)
-	}
-
-	for _, node := range allNodes {
-		c := client.NewServiceClient(node.NodeAddr, node.NodePort)
-		tag := strings.ToLower(node.NodeTag)
-
-		// 删除用户
-		if err := rc.RemoveUser(tag, user.Email, c); err != nil {
-			common.Silent(err)
-		} else {
-			log.Printf("成功删除：[%s(%s)]->[%s]\n", user.Email, user.Token, node.NodeAddr)
-		}
-
-		// 刷新用户
-		if common.Combine(node.ID, nids) && user.Role != orm.LAVEL_USER_BLOCK {
-			if err := rc.AddUser(tag, user.Email, user.Token, 0, c); err != nil {
-				common.Silent(err)
-				log.Printf("用户添加失败：[%s(%s)] error: %s \n", user.Email, node.NodeAddr, err.Error())
-			} else {
-				log.Printf("用户添加失败：[%s(%s)]->[%s]\n", user.Email, user.Token, node.NodeAddr)
-			}
-		}
-	}
-}
-
-func PutChangeUserPassword() gin.HandlerFunc {
+func UserPasswordChangeHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var requestData = &internal.ChangePasswordRequest{}
-		if err := c.ShouldBindJSON(&requestData); err != nil {
-			c.AbortWithStatusJSON(200, gin.H{"data": requestData, "error": err.Error()})
+		request := new(internal.RequestWithEmailAndPassword)
+		if err := c.ShouldBindJSON(&request); err != nil {
+			c.AbortWithStatusJSON(200, gin.H{"data": request, "error": err.Error()})
 			return
 		}
 
 		var user orm.User
-		if err := orm.DB().Model(&user).Where("email=?", requestData.Email).First(&user); errors.Is(err.Error, gorm.ErrRecordNotFound) {
-			c.AbortWithStatusJSON(200, gin.H{"data": requestData, "error": err.Error})
+		if err := orm.DB().Model(&user).Where("email=?", request.Email).First(&user); errors.Is(err.Error, gorm.ErrRecordNotFound) {
+			c.AbortWithStatusJSON(200, gin.H{"data": request, "error": err.Error})
 			return
 		}
 
-		user.Password = util.Hash(user.Email, requestData.Password)
+		user.Password = util.Hash(user.Email, request.Password)
 		if r := orm.DB().Save(&user); r.Error == nil {
 			c.JSON(200, gin.H{"status": 2000, "message": "数据添加成功"})
 			return
@@ -291,7 +254,7 @@ func GetUserConfigPath() gin.HandlerFunc {
 			return
 		}
 
-		go flushNodesByUser(user)
+		go refreshNodesByUser(user)
 
 		obj := clash.Default()
 

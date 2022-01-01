@@ -12,7 +12,7 @@
             <div class="form-control">
               <label for="role">用户组</label>
               <div class="form-input">
-                <select id="role" name="role">
+                <select v-model="roleId" id="role" name="role">
                   <option value="1">管理员账户</option>
                   <option value="2">普通用户</option>
                   <option value="0">锁定该用户</option>
@@ -53,16 +53,17 @@ export default {
   data: () => ({
     show: false,
     email: '',
+    roleId: 0,
     nodes: []
   }),
   created() {
     // this.getNodesWithUser(this.email)
   },
   methods: {
-    getNodesWithUser(email) {
+    getNodesWithUser(email, roleId = 0) {
+      this.roleId = roleId
       let data = new FormData()
       data.append("email", email)
-
       return this.$api.post("/users/nodes", data).then((res) => {
         return res.data
       }).then(data => {
@@ -81,12 +82,11 @@ export default {
 
       data.append("node", nodes)
 
-      this.$api.post("/users/nodeSetting", data).then(res => {
+      this.$api.post("/users/setting", data).then(res => {
         return res.data
       }).then(r => {
         if (r.status == 2000) {
           alert(r.message)
-          location.reload()
         }
         location.reload()
       })
