@@ -44,7 +44,7 @@ export default {
       data.append("addr", this.addr)
       data.append("port", this.port)
 
-      this.$api.post("/node/available", data).then((res) => {
+      this.$api.post("/node/health", data).then((res) => {
         if (res.status == 200) {
           this.available = res.data.state;
         }
