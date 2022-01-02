@@ -54,7 +54,7 @@ func StartWebApplication() error {
 			node := api.Group("/node")
 			{
 				node.POST("", controller.NodeAddHandler())
-				node.POST("/available", controller.NodeAvailableTestHandler())
+				node.POST("/health", controller.NodeHealthTestHandler())
 			}
 
 			user := api.Group("users")

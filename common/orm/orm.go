@@ -5,7 +5,6 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
-	"log"
 	"strings"
 )
 
@@ -33,7 +32,6 @@ func AutoMigrate(dst ...interface{}) error {
 }
 
 func DB() *gorm.DB {
-	log.Println("The database object is called")
 	return db
 }
 

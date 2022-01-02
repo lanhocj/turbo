@@ -2,8 +2,8 @@
 
 
 
-> 一款代理管理工具，基于 [XRay][0] 的开放 API 实现。
-> 
+> A lightweight agent node management tool, based on the [XRay][0] API, to facilitate the management of xray's proxy clusters.
+
 
 PS:  *目前还在开发阶段，!!并不安全!!*
 

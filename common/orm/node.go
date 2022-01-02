@@ -56,8 +56,8 @@ type User struct {
 	Nodes []Node `json:"nodes" gorm:"many2many:node_user;"`
 }
 
-func (u *User) BeforeCreate() {
+func (u *User) BeforeCreate(db *gorm.DB) error {
 	r := uuid.New()
 	u.Token = r.String()
-	return
+	return nil
 }

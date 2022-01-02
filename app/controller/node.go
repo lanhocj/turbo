@@ -7,7 +7,7 @@ import (
 	"github.com/laamho/turbo/common/orm"
 )
 
-func NodeAvailableTestHandler() gin.HandlerFunc {
+func NodeHealthTestHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var data internal.NodeAvailableRequest
 

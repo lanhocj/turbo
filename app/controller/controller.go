@@ -115,7 +115,7 @@ func NodesListHandler() gin.HandlerFunc {
 		node := new(orm.Node)
 		var nodes []orm.Node
 		orm.DB().Where("hash", token).Find(&user)
-		orm.DB().Model(node).Find(&nodes)
+		orm.DB().Model(&node).Order("node_name ASC").Limit(10).Find(&nodes)
 
 		var nodeResult []map[string]interface{}
 
