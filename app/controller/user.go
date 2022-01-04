@@ -114,7 +114,7 @@ func UserNodesHandler() gin.HandlerFunc {
 		}
 
 		var nodes []orm.Node
-		orm.DB().Model(&orm.Node{}).Find(&nodes)
+		orm.DB().Model(&orm.Node{}).Order("node_name ASC").Find(&nodes)
 		var user orm.User
 
 		if r := orm.DB().Model(&user).Preload("Nodes").Where("email=?", reqeustData.Email).First(&user); errors.Is(r.Error, gorm.ErrRecordNotFound) {
@@ -249,7 +249,7 @@ func GetUserConfigPath() gin.HandlerFunc {
 		token := c.Param("token")
 		user := new(orm.User)
 
-		if r := orm.DB().Preload("Nodes").Model(user).Where("token=?", token).First(&user); errors.Is(r.Error, gorm.ErrRecordNotFound) {
+		if r := orm.DB().Preload("Nodes", func(db *gorm.DB) *gorm.DB { return db.Order("node_name ASC") }).Where("token=?", token).First(&user); errors.Is(r.Error, gorm.ErrRecordNotFound) {
 			c.AbortWithStatus(404)
 			return
 		}
