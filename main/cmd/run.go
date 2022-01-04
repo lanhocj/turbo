@@ -33,7 +33,7 @@ func serveActionHandler(c *cli.Context) error {
 		log.Fatalf("config file: %s does supported!", ext)
 	}
 
-	if err := conf.LoadFile(configFilePath); err != nil {
+	if err := conf.ReadInFile(configFilePath); err != nil {
 		log.Fatal(err)
 	}
 

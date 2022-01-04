@@ -16,8 +16,10 @@
 
 
       <div class="form-control">
-        <div class="form-input">
+        <div class="form-input form-group">
           <input readonly :value="currentUrl" type="text">
+
+          <button @click="copy" class="copy">一键复制</button>
         </div>
       </div>
 
@@ -35,6 +37,7 @@ export default {
   data: () => ({
     currentUrl: ""
   }),
+
   created() {
     this.currentUrl = this.url
   },
@@ -50,6 +53,19 @@ export default {
           location.reload()
         })
       }
+    },
+    copy(e) {
+      let transfer = document.createElement('input');
+      document.body.appendChild(transfer);
+      transfer.value = this.currentUrl;
+      transfer.focus();
+      transfer.select();
+      if (document.execCommand('copy')) {
+        document.execCommand('copy');
+      }
+      transfer.blur();
+      console.log('复制成功');
+      document.body.removeChild(transfer);
     }
   },
   computed: {

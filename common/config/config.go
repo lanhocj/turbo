@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-type Object struct {
+type object struct {
 	Database struct {
 		Driver   string `yaml:"driver" json:"driver,omitempty"`
 		URI      string `yaml:"uri" json:"uri,omitempty"`
@@ -36,11 +36,11 @@ type Object struct {
 	} `yaml:"app"`
 }
 
-var cnf = &Object{}
+var cnf = &object{}
 
-func New() *Object { return cnf }
+func New() *object { return cnf }
 
-func (c *Object) LoadFile(in string) error {
+func (c *object) ReadInFile(in string) error {
 	tmp, err := ioutil.ReadFile(in)
 	if err != nil {
 		return err
@@ -53,11 +53,11 @@ func (c *Object) LoadFile(in string) error {
 	return nil
 }
 
-func (c *Object) GetAddr() string     { return net.JoinHostPort(c.Http.Host, c.Http.Port) }
-func (c *Object) GetDbDriver() string { return cnf.Database.Driver }
-func (c *Object) getSecret() string   { return cnf.App.Secret }
+func (c *object) GetAddr() string     { return net.JoinHostPort(c.Http.Host, c.Http.Port) }
+func (c *object) GetDbDriver() string { return cnf.Database.Driver }
+func (c *object) getSecret() string   { return cnf.App.Secret }
 
-func (c *Object) GetDSN() string {
+func (c *object) GetDSN() string {
 	if len(c.Database.URI) <= 0 {
 		return fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=true",
 			c.Database.User,
@@ -74,7 +74,7 @@ func (c *Object) GetDSN() string {
 func GetAddr() string     { return cnf.GetAddr() }
 func GetDbDriver() string { return cnf.GetDbDriver() }
 func GetDSN() string      { return cnf.GetDSN() }
-func Copy() *Object       { return cnf }
+func Copy() *object       { return cnf }
 
 func GetTemplateDir() string         { return cnf.App.TemplateDir }
 func GetStaticDir() string           { return cnf.App.StaticDir }
