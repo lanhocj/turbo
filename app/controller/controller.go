@@ -149,8 +149,6 @@ func UserLockHandler() gin.HandlerFunc {
 			return
 		}
 
-		deleteNodesByEmail(request.Email)
-
 		user := new(orm.User)
 		if r := orm.DB().Model(user).Where("email=?", request.Email).First(&user); r.Error != nil {
 			c.AbortWithStatusJSON(200, gin.H{"message": "查询错误", "error": r.Error})

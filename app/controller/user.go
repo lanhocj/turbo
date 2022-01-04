@@ -210,6 +210,8 @@ func UserRemoveHandler() gin.HandlerFunc {
 			common.Silent(err)
 		}
 
+		go deleteNodesByEmail(request.Email)
+
 		if r := orm.DB().Model(user).Where("email=?", request.Email).Delete(&user); errors.Is(r.Error, gorm.ErrRecordNotFound) {
 			c.AbortWithStatusJSON(200, gin.H{"message": "没有找到这个账户", "error": r.Error})
 			return
