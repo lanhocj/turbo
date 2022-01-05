@@ -12,6 +12,8 @@ import (
 	"sync"
 )
 
+const MUN = 20
+
 func deleteNodesByEmail(email string) {
 	var nodes []*orm.Node
 	var lock sync.Mutex
@@ -25,7 +27,7 @@ func deleteNodesByEmail(email string) {
 			lock.Lock()
 			defer lock.Unlock()
 			deadline := 0
-			
+
 		reset:
 			c := client.NewServiceClient(node.NodeAddr, node.NodePort)
 			tag := strings.ToLower(node.NodeTag)
@@ -35,7 +37,7 @@ func deleteNodesByEmail(email string) {
 			if err := transport.RemoveUser(tag, email, c); err != nil {
 				common.Silent(err)
 
-				if ok, _ := regexp.MatchString(`Unavailable`, err.Error()); ok && deadline <= 10 {
+				if ok, _ := regexp.MatchString(`Unavailable`, err.Error()); ok && deadline <= MUN {
 					fmt.Printf("第 %d 次尝试", deadline)
 					goto reset
 				}
@@ -74,7 +76,7 @@ func refreshNodesByUser(user *orm.User) {
 			if err := transport.RemoveUser(tag, user.Email, c); err != nil {
 				common.Silent(err)
 
-				if ok, _ := regexp.MatchString(`Unavailable`, err.Error()); ok && deadline <= 10 {
+				if ok, _ := regexp.MatchString(`Unavailable`, err.Error()); ok && deadline <= MUN {
 					fmt.Printf("第 %d 次尝试", deadline)
 					goto resetDelete
 				}
@@ -97,7 +99,7 @@ func refreshNodesByUser(user *orm.User) {
 					common.Silent(err)
 					log.Printf("用户添加失败：[%s(%s)] error: %s \n", user.Email, node.NodeAddr, err.Error())
 
-					if ok, _ := regexp.MatchString(`Unavailable`, err.Error()); ok && deadline <= 10 {
+					if ok, _ := regexp.MatchString(`Unavailable`, err.Error()); ok && deadline <= MUN {
 						fmt.Printf("第 %d 次尝试", deadline)
 						goto reset
 					}

@@ -156,6 +156,8 @@ func UserLockHandler() gin.HandlerFunc {
 		}
 		user.Locked = !user.Locked
 
+		go deleteNodesByEmail(request.Email)
+
 		if r := orm.DB().Save(&user); r.Error != nil {
 			c.AbortWithStatusJSON(200, gin.H{"message": "操作失败", "error": r.Error})
 			return
